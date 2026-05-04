@@ -78,15 +78,10 @@ git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/.claude/ski
 
 ### 2. Install the runtime layer
 
-```bash
-# For Claude Code + OMC:
-npm i -g oh-my-claude-sisyphus@latest
-omc setup
+Install from the GitHub repos — the README on each page has the full install instructions:
 
-# For Codex + OMX:
-npm install -g @openai/codex oh-my-codex
-omx setup
-```
+- **OMC (Claude Code):** https://github.com/yeachan-heo/oh-my-claudecode
+- **OMX (Codex):** https://github.com/Yeachan-Heo/oh-my-codex
 
 ### 3. Run the assessment
 
