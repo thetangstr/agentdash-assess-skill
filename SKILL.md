@@ -53,22 +53,24 @@ Check if `~/skills/assess-agentic/SKILL.md` exists. If not:
 
 ### 0b: OMC pre-flight check
 
-After confirming the skill is installed, verify OMC (oh-my-claudecode) is installed.
+After confirming the skill is installed, verify OMC (oh-my-claudecode) is installed. **This is a hard gate — do not proceed to Phase 1 without OMC.**
 
 1. **Check if OMC is installed**: Try invoking `Skill("omc-reference")` or check if `/oh-my-claudecode` commands work in the current session.
-2. **If OMC is not installed**, tell the user:
+2. **If OMC is not installed, hard stop.** Do not proceed to Phase 1. Tell the user:
 
-> "This skill requires OMC (oh-my-claudecode) to be installed first, because it relies on the `deep-interview` skill for adaptive interviewing. To install OMC, run:
+> "This skill requires OMC (oh-my-claudecode) to be installed first, because it relies on the `deep-interview` skill for adaptive Socratic requirements gathering. Please install OMC first:
 >
 > ```bash
 > curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
 > ```
 >
-> After installing OMC, restart your Claude Code session and try again."
+> After installing OMC, restart your Claude Code session and run `/assess-agentic` again."
 
-3. **If OMC is installed but deep-interview is not available**, the skill will still work — but it will skip the deep-interview handoff and fall back to a manual intake-based assessment. Notify the user: "Deep-interview skill not found — running in limited mode."
+3. **If OMC is installed but deep-interview is not available**, also hard stop. Tell the user:
 
-Proceed to Phase 1 only after both the skill is installed and the pre-flight check passes.
+> "OMC is installed but the `deep-interview` skill was not found. This skill requires the full OMC deep-interview suite. Please ensure OMC is fully installed with: `omc setup`"
+
+Proceed to Phase 1 only after OMC and deep-interview are confirmed available.
 
 ## Phase 1: Intake
 

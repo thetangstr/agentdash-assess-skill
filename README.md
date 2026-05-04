@@ -38,10 +38,11 @@ The skill will detect it's not installed, clone itself from GitHub, update your 
 ## Pre-requisites
 
 - **Claude Code** installed
-- **OMC (oh-my-claudecode)** — the skill's pre-flight check will guide install if missing:
+- **OMC (oh-my-claudecode)** — **required.** The skill will not run without it. Install first:
   ```bash
   curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
   ```
+  The skill performs a hard pre-flight check — if OMC is missing, it stops and prompts you to install before proceeding.
 - **pandoc** (optional) — for PDF export:
   ```bash
   brew install pandoc
