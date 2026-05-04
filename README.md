@@ -1,6 +1,6 @@
 # assess-agentic
 
-A forward-deployed consulting engagement skill for agentic workflow readiness assessment. Delivered as a Claude Code skill that guides a Senior Strategy Consultant through a structured discovery process — from initial intake through deep Socratic interview to a client-ready project charter.
+A forward-deployed consulting engagement skill for agentic workflow readiness assessment. Delivered as a Claude Code and Codex skill that guides a Senior Strategy Consultant or client DRI (directly responsible individual) through a structured discovery process — from initial intake through deep Socratic interview to a client-ready project charter.
 
 ## Status
 
