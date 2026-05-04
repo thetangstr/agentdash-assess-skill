@@ -11,9 +11,9 @@ Claude Code and Codex skill for agentic workflow readiness assessment — delive
 5. **Research** — fetches and summarizes the company website, detects industry
 6. **Domain & Competitive Research** — researches latest solutions for the target domain/industry, competitive landscape, peer case studies (Phase 2c — mandatory)
 7. **Deep-interview** — hands off to the selected runtime's `deep-interview` skill with consultant persona framing, business-outcome discipline, and closed-loop architecture probes
-8. **Report** — outputs a structured markdown + JSON readiness report (company portfolio scan or project charter format)
-9. **PDF Export** — generates a client-ready project charter PDF (if pandoc is installed)
-10. **Handoff** — offers runtime-specific execution options (OMC: omc-plan/autopilot, OMX: $ralplan/$ralph/$team, refine, or exit)
+8. **Report** — preserves the crystallized spec as markdown + JSON
+9. **DOCX Export** — generates a client-ready Word document (if pandoc is installed)
+10. **Stop after delivery** — presents the artifacts and does not launch planning or execution
 
 ## The consulting discipline
 
@@ -57,10 +57,9 @@ The skill detects whether it is running under Claude Code/OMC or Codex/OMX, inst
   omx doctor
   ```
   The skill performs a hard pre-flight check. If the workflow layer for the active host is missing, it stops and prompts you to install before proceeding.
-- **pandoc** (optional) — for PDF export:
+- **pandoc** (optional) — for DOCX export:
   ```bash
   brew install pandoc
-  brew install --cask wkhtmltopdf  # for best PDF quality
   ```
 
 ## Test on a fresh machine (no setup)
@@ -104,9 +103,9 @@ After a complete assessment, three files are saved:
 
 | File | Description |
 |------|-------------|
-| `.omc/specs/assess-{slug}.md` or `.omx/specs/assess-{slug}.md` | Canonical markdown report — company portfolio scan or project charter |
+| `.omc/specs/assess-{slug}.md` or `.omx/specs/assess-{slug}.md` | Canonical markdown spec — company portfolio scan or project charter |
 | `.omc/specs/assess-{slug}.json` or `.omx/specs/assess-{slug}.json` | Structured JSON with dimensions breakdown and crystallized spec |
-| `.omc/specs/assess-{slug}.pdf` or `.omx/specs/assess-{slug}.pdf` | Client-ready PDF project charter (if pandoc installed) |
+| `.omc/specs/assess-{slug}.docx` or `.omx/specs/assess-{slug}.docx` | Client-ready Word document (if pandoc installed) |
 
 ## Report formats
 
@@ -143,7 +142,7 @@ cd ~/skills/assess-agentic && git pull
 |------|---------|
 | `SKILL.md` | Main skill definition — intake, research, deep-interview seeding, report generation |
 | `knowledge.md` | Consultant frameworks — persona, interrogation ladder, dimensions, tier classification |
-| `strategy.md` | Report templates — company/project formats, go/no-go criteria, PDF config |
+| `strategy.md` | Report templates — company/project formats, go/no-go criteria, DOCX config |
 | `ROADMAP.md` | Ongoing development tracking — backlog, version history |
 | `CONSULTANT_GUIDE.md` | Quick-start guide for consultants running engagements |
 | `clients/` | Client engagement tracking and sample outputs |
@@ -160,19 +159,7 @@ cd ~/skills/assess-agentic && git pull
 ## Skill pipeline
 
 ```
-assess-agentic → deep-interview → plan → execute
+assess-agentic → deep-interview → markdown/json → DOCX
 ```
 
-The skill chains into the selected runtime's standard pipeline after the assessment crystallizes:
-
-**OMC / Claude Code**
-1. **Plan the agentic workflow** — `omc-plan --consensus --direct`
-2. **Execute a pilot** — `autopilot` with spec as context
-3. **Refine the assessment** — continue deep-interview to reduce ambiguity
-4. **Save and exit** — keep the spec for later
-
-**OMX / Codex**
-1. **Plan the agentic workflow** — `$ralplan` with the saved spec as context
-2. **Execute a pilot** — `$ralph` for a single-owner completion loop, or `$team` for parallel execution
-3. **Refine the assessment** — continue `$deep-interview`
-4. **Save and exit** — keep the spec for later
+The skill stops after generating the stakeholder-ready DOCX. It does not automatically invoke runtime planning or execution tools.

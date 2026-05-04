@@ -263,29 +263,23 @@ Use these thresholds for the readiness decision:
 
 ---
 
-## Section 7: PDF Export Configuration
+## Section 7: DOCX Export Configuration
 
-For pandoc-based PDF generation:
+For pandoc-based DOCX generation:
 
 ```bash
 pandoc {runtime_output_dir}/assess-{slug}.md \
-  -o {runtime_output_dir}/assess-{slug}.pdf \
-  --pdf-engine=wkhtmltopdf \
+  -o {runtime_output_dir}/assess-{slug}.docx \
   --from=markdown \
   --toc \
   --toc-depth=2 \
+  --reference-doc=default \
   --metadata title="{company_name} - Agentic Workflow Readiness Assessment" \
   --metadata author="AgentDash Consulting" \
   --metadata date="{ISO_date}"
 ```
 
-Fallback engine (if wkhtmltopdf unavailable):
+Fallback check (if pandoc unavailable):
 ```bash
-pandoc {runtime_output_dir}/assess-{slug}.md \
-  -o {runtime_output_dir}/assess-{slug}.pdf \
-  --pdf-engine=pdflatex \
-  --from=markdown \
-  --toc --toc-depth=2 \
-  --metadata title="{company_name} - Agentic Workflow Readiness Assessment" \
-  --metadata author="AgentDash Consulting"
+python3 -c "import docx" 2>/dev/null && echo "python-docx available" || echo "no docx tool"
 ```

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This skill delivers forward-deployed consulting engagements for AI agent adoption readiness. Each assessment produces a crystallized spec ready for execution through the user's active runtime: OMC (`omc-plan` / `autopilot`) or OMX (`$ralplan` / `$ralph` / `$team`).
+This skill delivers forward-deployed consulting engagements for AI agent adoption readiness. Each assessment produces a crystallized spec and stakeholder-ready DOCX through the user's active runtime: OMC for Claude Code or OMX for Codex.
 
 ## Current Status
 
@@ -40,10 +40,10 @@ This skill delivers forward-deployed consulting engagements for AI agent adoptio
 ## Skill Pipeline
 
 ```
-assess-agentic → deep-interview → runtime-specific plan → runtime-specific execute
+assess-agentic → deep-interview → markdown/json artifacts → DOCX
 ```
 
-After the assessment crystallizes, clients choose their execution path.
+After the assessment crystallizes, the skill exports the deliverable and stops.
 
 ---
 
@@ -64,4 +64,4 @@ After the assessment crystallizes, clients choose their execution path.
 - Company-level and project-level assessment support
 - Closed-loop architecture probing
 - Agent tier classification
-- PDF export via pandoc
+- DOCX export via pandoc

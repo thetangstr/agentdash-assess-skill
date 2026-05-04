@@ -8,7 +8,7 @@ This guide helps forward-deployed consultants run a client assessment engagement
    - Claude Code / OMC: `curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash`, then `omc setup`
    - Codex / OMX: `npm install -g @openai/codex oh-my-codex`, then `omx setup` and `omx doctor`
 2. **Assess skill installed** — `/assess-agentic` in Claude Code, or ask Codex/OMX to use `assess-agentic` (self-installs on first run)
-3. **pandoc for PDF** — `brew install pandoc` (optional but recommended)
+3. **pandoc for DOCX** — `brew install pandoc` (optional but recommended)
 
 ## Running an Assessment
 
@@ -40,20 +40,16 @@ The skill handles:
 - Website research and industry detection
 - Deep-interview Socratic loop
 - Report generation (markdown + JSON)
-- PDF export (if pandoc installed)
+- DOCX export (if pandoc installed)
 
 ### 4. Delivery
 
 The report is saved to:
 - `.omc/specs/assess-{slug}.md` or `.omx/specs/assess-{slug}.md` — markdown report
 - `.omc/specs/assess-{slug}.json` or `.omx/specs/assess-{slug}.json` — structured data
-- `.omc/specs/assess-{slug}.pdf` or `.omx/specs/assess-{slug}.pdf` — client-ready PDF
+- `.omc/specs/assess-{slug}.docx` or `.omx/specs/assess-{slug}.docx` — client-ready Word document
 
-Present execution options:
-1. **Plan** — OMC: `omc-plan --consensus --direct`; OMX: `$ralplan`
-2. **Execute** — OMC: `autopilot`; OMX: `$ralph` or `$team`
-3. **Refine** — OMC: deep-interview skill; OMX: `$deep-interview`
-4. **Save** — keep for later
+Present the deliverable and stop. Do not launch planning, execution, or refinement from this skill; the DOCX is the stakeholder review artifact.
 
 ### 5. Track the Engagement
 
