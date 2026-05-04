@@ -38,41 +38,15 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 
 <Steps>
 
-## Phase 0: Self-install + runtime check
+## Phase 0: Dependency installation — blocking gate
 
-**Gate: This phase must complete fully before any other phase begins. The skill cannot proceed without these dependencies.**
+**STOP. Do not proceed to Phase 1, 2, or any other phase until ALL steps in Phase 0 are complete.**
 
-This skill can bootstrap itself. Before starting, check if the skill is installed, and install it if missing, then detect the user's active agent runtime.
+This skill requires three dependencies to be installed and verified before any assessment work begins. This is a hard sequence — each step must fully complete before the next begins.
 
-### 0a: Self-install (if needed)
+### Step 1: Detect active host
 
-Check for an installed copy in the host-specific skill directory:
-- Claude Code / OMC: `~/skills/assess-agentic/SKILL.md` or `~/.claude/skills/assess-agentic/SKILL.md`
-- Codex / OMX: `${CODEX_HOME:-~/.codex}/skills/assess-agentic/SKILL.md`
-
-If missing, install for the active host:
-
-**Claude Code / OMC host:**
-1. Create the skills directory: `Bash: mkdir -p ~/skills`
-2. Clone the repo: `Bash: git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/skills/assess-agentic`
-3. Add the import to CLAUDE.md if not already present (check if `~/skills/assess-agentic/SKILL.md` appears in `~/.claude/CLAUDE.md`)
-4. If CLAUDE.md doesn't have the import yet, append the import line to `~/.claude/CLAUDE.md` using `Bash: echo '\n@import ~/skills/assess-agentic/SKILL.md' >> ~/.claude/CLAUDE.md`
-5. Tell the user: "Skill installed. Please run `/assess-agentic` again."
-
-**Codex / OMX host:**
-1. Create the skills directory: `Bash: mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"`
-2. Clone the repo: `Bash: git clone https://github.com/thetangstr/agentdash-assess-skill.git "${CODEX_HOME:-$HOME/.codex}/skills/assess-agentic"`
-3. Tell the user: "Skill installed. Restart Codex, then ask for `assess-agentic` again."
-
-### 0b: Runtime detection and pre-flight check
-
-**This is a hard gate. There is no limited mode. Either the deep-interview skill is available through the runtime the user is actually using (OMC for Claude Code, OMX for Codex), or the skill stops.**
-
-Runtime choice is based on the active host, not simply on which binaries are installed. Many machines have both `claude` and `codex`; do not choose OMC just because `claude` exists, and do not choose OMX just because `codex` exists.
-
-**Step 1 — Detect the active host and matching workflow layer:**
-
-Collect these signals:
+Run these commands and wait for all results:
 ```
 claude --version 2>/dev/null | head -1
 codex --version 2>/dev/null | head -1
@@ -80,122 +54,109 @@ omc --version 2>/dev/null | head -1
 omx --version 2>/dev/null | head -1
 ```
 
-Then select the runtime:
-- If the current agent host is **Claude Code** or the `Skill(...)` tool is available → select **OMC**.
-- If the current agent host is **Codex** or the user invoked this from an OMX-managed Codex session → select **OMX**.
-- If both hosts are installed but the active host is ambiguous, ask one concise question: "Are you running this assessment in Claude Code/OMC or Codex/OMX?"
-- If neither matching workflow layer is installed for the active host, offer to install that layer only.
+Determine the active runtime:
+- If Claude Code is running (the `Skill(...)` tool is available) → **OMC**
+- If Codex CLI is running → **OMX**
+- If ambiguous, ask: "Are you running Claude Code or Codex CLI?"
 
-After selection, set these variables and use them for every later phase:
-- `runtime_name`: `OMC` or `OMX`
+Set and record these variables for all later phases:
+- `runtime`: `OMC` or `OMX`
 - `runtime_host`: `Claude Code` or `Codex`
 - `runtime_output_dir`: `.omc/specs` for OMC, `.omx/specs` for OMX
-- `deep_interview_invocation`: OMC uses `Skill("oh-my-claudecode:deep-interview", ...)`; OMX uses the Codex in-session skill surface `$deep-interview "..."`
 
-**Step 2 — Check if deep-interview is available:**
+### Step 2: Install OMC or OMX if missing
 
-For selected **OMC (Claude Code)**:
+**This step blocks. Do not proceed until the runtime is installed and verified.**
+
+**For OMC — if not installed or not confirmed:**
+```
+OMC is required. Installing it now.
+```
+Run:
+```bash
+curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
+```
+Wait for completion. Then:
+```bash
+omc setup
+```
+Wait for completion.
+
+Verify with:
+```
+omc --version
+```
+
+**For OMX — if not installed or not confirmed:**
+```
+OMX is required. Installing it now.
+```
+Run:
+```bash
+npm install -g @openai/codex oh-my-codex
+```
+Wait for completion. Then:
+```bash
+omx setup
+omx doctor
+```
+Wait for completion.
+
+Verify with:
+```
+omx --version
+```
+
+**Do not proceed to Step 3 until the selected runtime is confirmed installed.**
+
+### Step 3: Verify deep-interview skill is available
+
+**This step blocks. Do not proceed until deep-interview is confirmed available.**
+
+**For OMC:**
 ```
 Skill("oh-my-claudecode:deep-interview", "--help")
 ```
+If this fails, the installation did not work. Report the error and stop.
 
-For selected **OMX (Codex)**:
+**For OMX:**
 ```
-omx --version
 omx doctor
 ```
-Then verify the in-session skill surface is available before handoff. In Codex, `$deep-interview` is an OMX skill invocation typed into the agent session, not a Bash executable. Do not run `$deep-interview` through Bash unless the local OMX version explicitly exposes it as a command.
+Confirm that `$deep-interview` is listed as an available in-session skill.
 
-If the selected runtime's deep-interview path is available, skip to Phase 1.
+**If deep-interview is unavailable after install attempts: stop. Report the error. Do not offer a workaround or limited mode.**
 
-**Step 3 — If deep-interview is NOT available, offer install:**
+### Step 4: Install pandoc for DOCX export
 
-**For selected OMC:**
-```
-"This skill requires OMC (oh-my-claudecode) with the deep-interview skill. It is not currently installed on this machine. May I install it now?
+**This step blocks. Do not proceed until pandoc is installed and verified.**
 
-[Install OMC] [Cancel and exit]"
-```
-
-- **Cancel and exit**: Say "Understood. Run `/assess-agentic` after OMC is installed." then stop. Do not collect intake. Do not offer limited mode.
-- **Install OMC**: run:
-  ```bash
-  curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
-  ```
-  Wait for it to finish. Then run:
-  ```bash
-  omc setup
-  ```
-  Wait for that to finish.
-
-**For selected OMX:**
-```
-"This skill requires OMX (oh-my-codex) with the deep-interview skill. It is not currently installed on this machine. May I install it now?
-
-[Install OMX] [Cancel and exit]"
-```
-
-- **Cancel and exit**: Say "Understood. Run `/assess-agentic` after OMX is installed." then stop.
-- **Install OMX**: run:
-  ```bash
-  npm install -g @openai/codex oh-my-codex
-  ```
-  Wait for it to finish. Then run:
-  ```bash
-  omx setup
-  omx doctor
-  ```
-  Wait for that to finish.
-
-**Step 4 — Verify again:**
-
-OMC: `Skill("oh-my-claudecode:deep-interview", "--help")`
-OMX: `omx doctor`, then confirm `$deep-interview` is available as a Codex/OMX in-session skill.
-
-If deep-interview is still unavailable after install, report the error and stop. Do not offer limited mode.
-
-**There is no limited mode. There is no manual fallback. If deep-interview is unavailable, the skill stops.**
-
-### 0c: DOCX export dependency check
-
-**`pandoc` is required.** The final deliverable is a DOCX file, so do not collect intake until DOCX export is possible.
-
-Check for pandoc:
+Check:
 ```bash
 pandoc --version 2>/dev/null | head -1
 ```
 
-If pandoc is available, continue to Phase 1.
+If not found, install:
+- **macOS:** `brew install pandoc`
+- **Linux (apt):** `sudo apt-get update && sudo apt-get install -y pandoc`
+- **Other:** https://pandoc.org/installing.html
 
-If pandoc is missing, offer to install it before continuing:
-
-**macOS with Homebrew available:**
-```bash
-brew install pandoc
-```
-
-**Debian/Ubuntu Linux:**
-```bash
-sudo apt-get update
-sudo apt-get install -y pandoc
-```
-
-**Other environments:** direct the user to install pandoc from https://pandoc.org/installing.html, then rerun `/assess-agentic`.
-
-After installation, verify again:
+Verify after installation:
 ```bash
 pandoc --version 2>/dev/null | head -1
 ```
 
-If pandoc is still unavailable, stop and say: "Pandoc is required to export the DOCX deliverable. Install pandoc, then rerun `/assess-agentic`." Do not proceed with markdown-only output.
+**If pandoc cannot be installed or verified: stop. Report that DOCX export is required and cannot proceed without it.**
 
-**Phase 0 complete gate:** Proceed to Phase 1 only after deep-interview and pandoc are both confirmed available.
+---
+
+**Phase 0 complete gate:** Only proceed to Phase 1 after ALL four steps above are verified complete — active host detected, runtime installed and verified, deep-interview available, and pandoc installed and verified.
 
 ---
 
 ## Phase 1: Intake
 
-**Gate: Phase 0 must be fully complete before starting Phase 1.**
+**STOP. Phase 0 must be fully complete before starting Phase 1. All Phase 0 dependencies (OMC/OMX, deep-interview, pandoc) must be installed and verified before collecting intake.**
 
 Collect these fields from the user using `AskUserQuestion`:
 
@@ -646,13 +607,16 @@ Why good: Never accepted the IT problem as the goal. Converted SharePoint chaos 
 </Escalation_And_Stop_Conditions>
 
 <Final_Checklist>
+- [ ] **Phase 0 — ALL dependencies confirmed installed and verified before any assessment work begins:**
+  - [ ] Active host detected (OMC or OMX)
+  - [ ] OMC or OMX runtime installed and verified
+  - [ ] deep-interview skill confirmed available through selected runtime
+  - [ ] pandoc installed and verified
 - [ ] Intake collected (company, URL, type)
 - [ ] Website researched and summary generated
-- [ ] Pre-interview pulse collected (business problem, outcome, cost of inaction, DRI, timeline, budget, systems, org size)
+- [ ] Pre-interview pulse collected (all 8 questions answered)
 - [ ] Domain & competitive research performed (Phase 2c — mandatory)
 - [ ] Deep-interview seeded with consultant persona + domain-specific framing + closed-loop probes
-- [ ] Active runtime detected and stored (`runtime_name`, `runtime_output_dir`, runtime-specific invocations)
-- [ ] Pandoc dependency verified before intake
 - [ ] Deep-interview completed (or user exited early)
 - [ ] Crystallized spec read from `{runtime_output_dir}/deep-interview-{slug}.md`
 - [ ] Markdown saved to `{runtime_output_dir}/assess-{slug}.md`
