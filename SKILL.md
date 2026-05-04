@@ -39,6 +39,25 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 
 <Steps>
 
+## Phase 0: Pre-flight check
+
+Before starting, verify OMC (oh-my-claudecode) is installed. This skill depends on the `deep-interview` skill which is part of OMC.
+
+1. **Check if OMC is installed**: Try invoking `Skill("omc-reference")` or check if `/oh-my-claudecode` commands work in the current session.
+2. **If OMC is not installed**, tell the user:
+
+> "This skill requires OMC (oh-my-claudecode) to be installed first, because it relies on the `deep-interview` skill for adaptive interviewing. To install OMC, run:
+>
+> ```bash
+> curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
+> ```
+>
+> After installing OMC, restart your Claude Code session and try again."
+
+3. **If OMC is installed but deep-interview is not available**, the skill will still work — but it will skip the deep-interview handoff and fall back to a manual intake-based assessment. Notify the user: "Deep-interview skill not found — running in limited mode."
+
+Proceed to Phase 1 only after the pre-flight check passes.
+
 ## Phase 1: Intake
 
 Collect these fields from the user using `AskUserQuestion`:
