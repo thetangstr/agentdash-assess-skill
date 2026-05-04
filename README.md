@@ -1,117 +1,94 @@
 # assess-agentic
 
-Claude Code and Codex skill for agentic workflow readiness assessment — delivered as a forward-deployed consulting engagement.
+A forward-deployed consulting engagement skill for agentic workflow readiness assessment. Delivered as a Claude Code skill that guides a Senior Strategy Consultant through a structured discovery process — from initial intake through deep Socratic interview to a client-ready project charter.
+
+## Status
+
+**v1.0 — Feature Complete** (Phase 2c shipped)
+
+This skill is production-ready for client engagements. Remaining open issues are scoped to human-consultant-only workflows (e.g., multi-session engagement tracking, proposal generation).
 
 ## What it does
 
-1. **Self-install** — bootstraps itself from GitHub if not yet installed
-2. **Pre-flight check** — detects the active host and verifies the matching workflow layer: OMC for Claude Code or OMX for Codex
-3. **Intake** — collects company name, URL, and assessment type (company vs. project)
-4. **Pre-Interview Pulse** — collects desired outcome, success metric, and top 2-3 pain points before the Socratic interview
-5. **Research** — fetches and summarizes the company website, detects industry
-6. **Domain & Competitive Research** — researches latest solutions for the target domain/industry, competitive landscape, peer case studies (Phase 2c — mandatory)
-7. **Deep-interview** — hands off to the selected runtime's `deep-interview` skill with consultant persona framing, business-outcome discipline, and closed-loop architecture probes
-8. **Report** — preserves the crystallized spec as markdown + JSON
-9. **DOCX Export** — generates a client-ready Word document with required pandoc
-10. **Stop after delivery** — presents the artifacts and does not launch planning or execution
-
-## The consulting discipline
-
-This skill operates as a Senior Strategy Consultant at AgentDash Consulting. Key principles:
-
-- **IT problems are never the goal.** "Clean up SharePoint" or "build a RAG chatbot" are symptoms. The skill always drills to: what business outcome is blocked, what does it cost in dollars or time?
-- **Business-outcome first.** Every system/integration question is reframed through: "what decision does this enable, and what does wrong output cost?"
-- **Hybridize first.** Buy commodity primitives; build only the differentiator.
-- **Ship working software, not slides.** The pilot deliverable is an agent in production with board controls wired in — not a strategy deck.
-
-## Install
-
-Use this skill from either supported host:
-
-```bash
-# Claude Code / OMC
-claude
-# Then say: /assess-agentic
-
-# Codex / OMX
-omx --madmax --high
-# Then ask Codex to use assess-agentic
+```
+Intake → Pre-Interview Pulse → Research → Domain & Competitive Research → Deep-Interview → Report → DOCX Export → Stop after delivery
 ```
 
-The skill detects whether it is running under Claude Code/OMC or Codex/OMX, installs into the matching skills directory if needed, and prompts you to restart or run it again.
+| Phase | Description |
+|-------|-------------|
+| **Intake** | Collects company name, URL, industry, and assessment type (company portfolio scan or project charter) |
+| **Pre-Interview Pulse** | Captures desired outcome, success metrics, and top 2–3 pain points before the Socratic loop |
+| **Research** | Fetches and summarizes the company website; detects industry and competitive context |
+| **Domain & Competitive Research** | Identifies latest solutions for the target domain, competitive landscape, and peer case studies |
+| **Deep-Interview** | Hands off to the active runtime's `deep-interview` skill with consultant persona framing, business-outcome discipline, and closed-loop architecture probes |
+| **Report** | Outputs structured markdown + JSON readiness report (company portfolio scan or project charter format) |
+| **DOCX Export** | Generates a client-ready Word document (requires pandoc) |
+| **Stop after delivery** | Presents the artifacts and exits — no automatic handoff to planning or execution |
 
-## Pre-requisites
+## Supported hosts
 
-- **One supported host**:
-  - Claude Code with **OMC (oh-my-claudecode)**
-  - Codex CLI with **OMX (oh-my-codex)**
-- **OMC install**:
-  ```bash
-  curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
-  omc setup
-  ```
-- **OMX install**:
-  ```bash
-  npm install -g @openai/codex oh-my-codex
-  omx setup
-  omx doctor
-  ```
-  The skill performs a hard pre-flight check. If the workflow layer for the active host is missing, it stops and prompts you to install before proceeding.
-- **pandoc** (required) — for DOCX export:
-  ```bash
-  brew install pandoc
-  ```
-  The skill verifies pandoc before intake and stops if DOCX export is not available.
+This skill runs on either Claude Code or Codex CLI:
 
-## Test on a fresh machine (no setup)
+| Host | Runtime | Install |
+|------|---------|---------|
+| **Claude Code** | OMC (oh-my-claudecode) | `curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash && omc setup` |
+| **Codex CLI** | OMX (oh-my-codex) | `npm install -g @openai/codex oh-my-codex && omx setup && omx doctor` |
 
-```bash
-# Create a new macOS user account:
-sudo sysadminctl -addUser testuser -password testpass
+The skill detects the active host at runtime, installs into the matching skills directory if needed, and runs the pre-flight check for the detected runtime layer.
 
-# Log in as testuser, open Terminal, install one supported host:
-# Claude Code + OMC, or Codex CLI + OMX
+## Consulting discipline
 
-# Claude Code path:
-claude
-# Then say: /assess-agentic
+This skill operates as a **Senior Strategy Consultant at AgentDash Consulting**.
 
-# Codex path:
-omx --madmax --high
-# Then ask Codex to use assess-agentic
+| Principle | Application |
+|-----------|--------------|
+| **IT problems are never the goal** | "Clean up SharePoint" or "build a RAG chatbot" are symptoms — always drill to the blocked business outcome |
+| **Business-outcome first** | Every system/integration question is reframed through: "what decision does this enable, and what does wrong output cost?" |
+| **Hybridize first** | Buy commodity primitives; build only the differentiator |
+| **Ship working software, not slides** | The pilot deliverable is an agent in production with board controls wired in — not a strategy deck |
 
-# The skill will self-install from GitHub, then the pre-flight check
-# will detect the active host and guide the matching OMC or OMX install.
-```
+## Prerequisites
 
-## Test with Docker
+| Dependency | Required | Notes |
+|------------|----------|-------|
+| **Claude Code** or **Codex CLI** | Yes | One of the two hosts required |
+| **OMC (Claude Code)** or **OMX (Codex)** | Yes | Hard requirement — skill will not run without the matching runtime layer |
+| **pandoc** | Yes | Required for DOCX export: `brew install pandoc` |
+
+## Quick start
 
 ```bash
-git clone https://github.com/thetangstr/agentdash-assess-skill.git /tmp/agentdash-assess-skill
-docker build -t assess-skill-test /tmp/agentdash-assess-skill
-docker run -it assess-skill-test
+# Install the matching runtime layer first:
 
-# Inside container — start the host you want to test:
-claude
-# Then say: /assess-agentic
+# For Claude Code:
+curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
+omc setup
 
-# Skill self-installs, pre-flight detects the missing runtime layer, guides install.
+# For Codex:
+npm install -g @openai/codex oh-my-codex
+omx setup
+
+# Start the host:
+claude        # or: omx --madmax --high
+
+# Run the skill — it self-installs on first run:
+/assess-agentic
 ```
 
 ## Output artifacts
 
-After a complete assessment, three files are saved:
+After a complete assessment, three files are written to the active runtime's specs directory:
 
 | File | Description |
 |------|-------------|
-| `.omc/specs/assess-{slug}.md` or `.omx/specs/assess-{slug}.md` | Canonical markdown spec — company portfolio scan or project charter |
-| `.omc/specs/assess-{slug}.json` or `.omx/specs/assess-{slug}.json` | Structured JSON with dimensions breakdown and crystallized spec |
-| `.omc/specs/assess-{slug}.docx` or `.omx/specs/assess-{slug}.docx` | Client-ready Word document generated by required pandoc |
+| `assess-{slug}.md` | Canonical markdown report — company portfolio scan or project charter |
+| `assess-{slug}.json` | Structured JSON with dimensions breakdown and crystallized spec |
+| `assess-{slug}.docx` | Client-ready Word document generated by pandoc |
 
-## Report formats
+### Report formats
 
 **Company-level assessment** — full portfolio scan:
-- Executive Summary, AI Maturity Assessment, Layer Inflection Exposure
+- Executive Summary, AI Maturity Assessment, Layer Infraction Exposure
 - AI-Native Operating Diagnosis, Revenue & Cost Opportunities
 - Priority Matrix, Implementation Roadmap, Investment & ROI, Risk Factors
 
@@ -119,48 +96,78 @@ After a complete assessment, three files are saved:
 - Project Brief, Go/No-Go Decision, Business Case
 - Agent Architecture (Tier, org chart, buy/build per layer)
 - Closed-Loop Architecture, Success Metrics table, Team/RACI
-- Build List, Research Checklist, Phased Rollout (Week 1-6)
+- Build List, Research Checklist, Phased Rollout (Week 1–6)
 - Token-Maxing Budget, Risk Register, Pre-Kickoff Blockers
 
-Both end with an **agent-readable tail block** — machine-extractable TODO list (`- [ ] **TODO Week 1, Day 1:**`) ready to paste into ChatGPT, Codex, or Claude Code.
-
-## Dev workflow
-
-```bash
-# After editing SKILL.md locally, push to GitHub:
-# The skill self-installs from github.com/thetangstr/agentdash-assess-skill
-git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/skills/assess-agentic
-
-# Or pull latest from the git repo:
-cd ~/skills/assess-agentic && git pull
-
-# Restart Claude Code session to pick up changes
-```
+Both formats end with an **agent-readable tail block** — a machine-extractable TODO list (`- [ ] **TODO Week 1, Day 1:**`) ready to paste into ChatGPT, Codex, or Claude Code.
 
 ## Project structure
 
-| File | Purpose |
-|------|---------|
-| `SKILL.md` | Main skill definition — intake, research, deep-interview seeding, report generation |
-| `knowledge.md` | Consultant frameworks — persona, interrogation ladder, dimensions, tier classification |
-| `strategy.md` | Report templates — company/project formats, go/no-go criteria, DOCX config |
-| `ROADMAP.md` | Ongoing development tracking — backlog, version history |
-| `CONSULTANT_GUIDE.md` | Quick-start guide for consultants running engagements |
-| `clients/` | Client engagement tracking and sample outputs |
-| `Dockerfile` | Fresh-machine testing image |
-
-### clients/ directory
-
-| File | Purpose |
-|------|---------|
-| `clients/README.md` | Engagement lifecycle, tracking schema, privacy guide |
-| `clients/.engagements/engagements.json` | Active engagement records (gitignored) |
-| `clients/examples/sample-assessment.md` | Anonymized sample output for sales demos |
-
-## Skill pipeline
-
 ```
-assess-agentic → deep-interview → markdown/json → DOCX
+assess-agentic/
+├── SKILL.md                  # Main skill definition — intake, research, deep-interview seeding, report generation
+├── knowledge.md              # Consultant frameworks — persona, interrogation ladder, dimensions, tier classification
+├── strategy.md               # Report templates — company/project formats, go/no-go criteria, DOCX config
+├── CONSULTANT_GUIDE.md       # Quick-start guide for consultants running engagements
+├── clients/
+│   ├── README.md             # Engagement lifecycle, tracking schema, privacy guide
+│   ├── .engagements/         # Active engagement records (gitignored)
+│   └── examples/            # Anonymized sample outputs for sales demos
+├── Dockerfile                # Fresh-machine testing image
+└── README.md                # This file
 ```
 
-The skill stops after generating the stakeholder-ready DOCX. It does not automatically invoke runtime planning or execution tools.
+## Testing
+
+### Fresh-machine test (no setup)
+
+```bash
+# Create a new macOS user account:
+sudo sysadminctl -addUser testuser -password testpass
+
+# Log in as testuser, install Claude Code or Codex CLI:
+# https://docs.anthropic.com/en/docs/claude-code/getting-started
+# https://docs.codex.ai
+
+claude        # or: omx --madmax --high
+/assess-agentic
+
+# Skill self-installs from GitHub; pre-flight detects the active host
+# and guides matching runtime layer install if missing
+```
+
+### Docker test
+
+```bash
+git clone https://github.com/thetangstr/agentdash-assess-skill.git /tmp/agentdash-assess-skill
+docker build -t assess-skill-test /tmp/agentdash-assess-skill
+docker run -it assess-skill-test
+
+# Inside container — start the host you want to test:
+claude        # or: omx --madmax --high
+/assess-agentic
+
+# Skill self-installs, pre-flight detects the missing runtime layer, guides install
+```
+
+## Local development
+
+```bash
+# Clone the skill locally:
+git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/skills/assess-agentic
+
+# After editing, push to GitHub — the skill self-installs from github.com/thetangstr/agentdash-assess-skill
+cd ~/skills/assess-agentic && git push
+
+# Restart the host to pick up changes
+```
+
+## Open issues
+
+Current open issues are tracked at: [github.com/thetangstr/agentdash-assess-skill/issues](https://github.com/thetangstr/agentdash-assess-skill/issues)
+
+Remaining work is scoped to human-consultant-only workflows (engagement tracking, proposal generation, multi-session support).
+
+## License
+
+Proprietary — AgentDash Consulting. All client engagement data is confidential.
