@@ -1,10 +1,6 @@
 ---
 name: assess-agentic
-description: "Assess an organization for agentic workflow readiness — intake, deep-interview, and structured output"
-argument-hint: "[--company|--project] [--url <company_url>]"
-pipeline: "[assess-agentic, deep-interview, omc-plan, autopilot]"
-next-skill: deep-interview
-next-skill-args: --standard
+description: Assess an organization for agentic workflow readiness
 level: 3
 ---
 
