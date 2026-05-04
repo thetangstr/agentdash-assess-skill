@@ -39,9 +39,23 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 
 <Steps>
 
-## Phase 0: Pre-flight check
+## Phase 0: Self-install + OMC check
 
-Before starting, verify OMC (oh-my-claudecode) is installed. This skill depends on the `deep-interview` skill which is part of OMC.
+This skill can bootstrap itself. Before starting, check if the skill is installed, and install it if missing, then check for OMC.
+
+### 0a: Self-install (if needed)
+
+Check if `~/skills/assess-agentic/SKILL.md` exists. If not:
+
+1. Create the skills directory: `Bash: mkdir -p ~/skills`
+2. Clone the repo: `Bash: git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/skills/assess-agentic`
+3. Add the import to CLAUDE.md if not already present (check if `~/skills/assess-agentic/SKILL.md` appears in `~/.claude/CLAUDE.md`)
+4. If CLAUDE.md doesn't have the import yet, append the import line to `~/.claude/CLAUDE.md` using `Bash: echo '\n@import ~/skills/assess-agentic/SKILL.md' >> ~/.claude/CLAUDE.md`
+5. Tell the user: "Skill installed. Please run `/assess-agentic` again."
+
+### 0b: OMC pre-flight check
+
+After confirming the skill is installed, verify OMC (oh-my-claudecode) is installed.
 
 1. **Check if OMC is installed**: Try invoking `Skill("omc-reference")` or check if `/oh-my-claudecode` commands work in the current session.
 2. **If OMC is not installed**, tell the user:
@@ -56,7 +70,7 @@ Before starting, verify OMC (oh-my-claudecode) is installed. This skill depends 
 
 3. **If OMC is installed but deep-interview is not available**, the skill will still work — but it will skip the deep-interview handoff and fall back to a manual intake-based assessment. Notify the user: "Deep-interview skill not found — running in limited mode."
 
-Proceed to Phase 1 only after the pre-flight check passes.
+Proceed to Phase 1 only after both the skill is installed and the pre-flight check passes.
 
 ## Phase 1: Intake
 

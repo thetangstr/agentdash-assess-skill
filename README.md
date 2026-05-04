@@ -4,59 +4,67 @@ Claude Code skill for agentic workflow readiness assessment.
 
 ## What it does
 
-1. **Pre-flight check** — verifies OMC (oh-my-claudecode) is installed
-2. **Intake** — collects company name, URL, and assessment type
-3. **Research** — fetches and summarizes the company website
-4. **Deep-interview** — hands off to OMC's `deep-interview` skill for adaptive Socratic requirements gathering
-5. **Report** — outputs a structured markdown + JSON readiness report
-6. **Handoff** — offers execution options (omc-plan, autopilot, etc.)
+1. **Self-install** — bootstraps itself from GitHub if not yet installed
+2. **Pre-flight check** — verifies OMC (oh-my-claudecode) is installed
+3. **Intake** — collects company name, URL, and assessment type
+4. **Research** — fetches and summarizes the company website
+5. **Deep-interview** — hands off to OMC's `deep-interview` skill for adaptive Socratic requirements gathering
+6. **Report** — outputs a structured markdown + JSON readiness report
+7. **Handoff** — offers execution options (omc-plan, autopilot, etc.)
 
 ## Install
 
 ```bash
-# Clone the skill
-git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/skills/assess-agentic
+# One-liner — skill self-installs on first run:
+claude
 
-# Add to your CLAUDE.md
-@import ~/skills/assess-agentic/SKILL.md
+# Then just say:
+/assess-agentic
 ```
 
-## Test in Docker (fresh environment)
+The skill will detect it's not installed, clone itself from GitHub, update your CLAUDE.md, and prompt you to run again.
+
+## Test on a fresh machine (no setup)
 
 ```bash
-# Build the test image
-docker build -t assess-skill-test github.com/thetangstr/agentdash-assess-skill
+# Create a new macOS user account:
+sudo sysadminctl -addUser testuser -password testpass
 
-# Run the container
+# Log in as testuser, open Terminal, install Claude Code:
+# https://docs.anthropic.com/en/docs/claude-code/getting-started
+
+# Start Claude Code:
+claude
+
+# Just say this:
+/assess-agentic
+
+# The skill will self-install from GitHub, then the pre-flight check
+# will detect OMC is missing and guide the OMC install
+```
+
+## Test with Docker
+
+```bash
+git clone https://github.com/thetangstr/agentdash-assess-skill.git /tmp/agentdash-assess-skill
+docker build -t assess-skill-test /tmp/agentdash-assess-skill
 docker run -it assess-skill-test
 
-# Inside the container — verify clean state
-which omc  # should return empty (OMC not installed)
-
-# Start Claude Code (will prompt for auth on first run)
+# Inside container — Claude Code is installed, OMC is NOT:
 claude
 
-# In the Claude Code session, import and run the skill:
-@import ~/skills/assess-agentic/SKILL.md
-
-# Then trigger:
+# Then just say:
 /assess-agentic
 
-# The pre-flight check should fire, telling you to install OMC
+# Skill self-installs, pre-flight detects OMC missing, guides install
 ```
 
-## Fresh macOS test (no VM)
+## Dev workflow
 
 ```bash
-# Create a test directory with no CLAUDE.md
-mkdir ~/test-assess && cd ~/test-assess
+# After editing SKILL.md locally:
+cd ~/skills/assess-agentic
+git pull  # or push from your working copy
 
-# Open Claude Code (it will start with no project context)
-claude
-
-# Import the skill:
-@import ~/skills/assess-agentic/SKILL.md
-
-# Run:
-/assess-agentic
+# Restart Claude Code session to pick up changes
 ```
