@@ -51,47 +51,84 @@ Check if `~/skills/assess-agentic/SKILL.md` exists. If not:
 4. If CLAUDE.md doesn't have the import yet, append the import line to `~/.claude/CLAUDE.md` using `Bash: echo '\n@import ~/skills/assess-agentic/SKILL.md' >> ~/.claude/CLAUDE.md`
 5. Tell the user: "Skill installed. Please run `/assess-agentic` again."
 
-### 0b: OMC pre-flight check and install
+### 0b: Runtime detection and pre-flight check
 
-After confirming the skill is installed, verify OMC (oh-my-claudecode) is installed and deep-interview is available. **This is a hard gate — do not proceed to Phase 1 without both.**
+**This is a hard gate. There is no limited mode. Either the deep-interview skill is available (via OMC or OMX), or the skill stops.**
 
-1. **Check if OMC is installed**: Try invoking `Skill("omc-reference")`. If it succeeds, OMC is available — skip to Step 4.
+**Step 1 — Detect which runtime is available:**
 
-2. **If OMC is NOT installed, ask the user for permission:**
-   ```
-   "This skill requires OMC (oh-my-claudecode) to be installed first — it includes the deep-interview skill needed for the Socratic requirements gathering. May I install it now?
-   [Install OMC] [Cancel]"
-   ```
-   - If user declines: hard stop. Do not proceed.
-   - If user accepts: run the install:
-     ```bash
-     curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
-     ```
-     Wait for the install to complete before proceeding.
+Check which CLI is running:
+```
+claude --version 2>/dev/null | head -1
+codex --version 2>/dev/null | head -1
+```
 
-3. **After install, verify OMC is ready**: Try `Skill("omc-reference")` again.
+- If `claude` is found → OMC runtime (oh-my-claudecode)
+- If `codex` is found → OMX runtime (oh-my-codex)
+- If neither → neither OMC nor OMX is installed
 
-4. **If OMC is installed but deep-interview is not available**, ask the user:
-   ```
-   "OMC is installed but the deep-interview skill was not found. May I run `omc setup` to install the full skill suite?
-   [Run omc setup] [Cancel]"
-   ```
-   - If user declines: hard stop.
-   - If user accepts: run `omc setup` and wait for it to complete.
+**Step 2 — Check if deep-interview is available:**
 
-5. **Final verification**: Attempt the exact invocation that will be used in Phase 3:
-   ```
-   Skill("oh-my-claude:deep-interview", "--help")
-   ```
-   If this returns without error, deep-interview is confirmed available.
+For **OMC (claude)**:
+```
+Skill("oh-my-claude:deep-interview", "--help")
+```
 
-**Hard stop conditions:**
-- If user declines any install prompt: do not proceed
-- If OMC install fails: report the error and do not proceed
-- If deep-interview is unavailable after `omc setup`: report the error and do not proceed
-- Do not proceed to Phase 1 until Step 5 confirms deep-interview is available
+For **OMX (codex)** — invoke via Bash:
+```bash
+$deep-interview --help
+```
 
-Proceed to Phase 1 only after OMC and deep-interview are confirmed available.
+If either returns without error, deep-interview is available — skip to Phase 1.
+
+**Step 3 — If deep-interview is NOT available, offer install:**
+
+**For OMC:**
+```
+"This skill requires OMC (oh-my-claudecode) with the deep-interview skill. It is not currently installed on this machine. May I install it now?
+
+[Install OMC] [Cancel and exit]"
+```
+
+- **Cancel and exit**: Say "Understood. Run `/assess-agentic` after OMC is installed." then stop. Do not collect intake. Do not offer limited mode.
+- **Install OMC**: run:
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
+  ```
+  Wait for it to finish. Then run:
+  ```bash
+  omc setup
+  ```
+  Wait for that to finish.
+
+**For OMX:**
+```
+"This skill requires OMX (oh-my-codex) with the deep-interview skill. It is not currently installed on this machine. May I install it now?
+
+[Install OMX] [Cancel and exit]"
+```
+
+- **Cancel and exit**: Say "Understood. Run `/assess-agentic` after OMX is installed." then stop.
+- **Install OMX**: run:
+  ```bash
+  npm install -g @openai/codex oh-my-codex
+  ```
+  Wait for it to finish. Then run:
+  ```bash
+  omx setup
+  ```
+  Wait for that to finish.
+
+**Step 4 — Verify again:**
+
+OMC: `Skill("oh-my-claude:deep-interview", "--help")`
+OMX: `$deep-interview --help` via Bash
+
+If deep-interview is still unavailable after install, report the error and stop. Do not offer limited mode.
+
+**There is no limited mode. There is no manual fallback. If deep-interview is unavailable, the skill stops.**
+
+Proceed to Phase 1 only after deep-interview is confirmed available.
 
 ## Phase 1: Intake
 
@@ -234,18 +271,21 @@ Classify the target agentic workflow on this typology:
 
 ### Invoke deep-interview NOW
 
-**This is a required step. You MUST invoke the deep-interview skill using the correct OMC prefix. Do not skip to Phase 4.**
+**This is a required step. Use the correct invocation syntax for the detected runtime.**
 
-**Correct invocation syntax:**
+**For OMC (claude CLI):**
 ```
 Skill("oh-my-claudecode:deep-interview", "--standard <company_name> agentic workflow readiness assessment")
 ```
 
-**Incorrect (will silently fail):**
+**For OMX (codex CLI):**
+```bash
+$deep-interview "--standard <company_name> agentic workflow readiness assessment"
 ```
-Skill("deep-interview", "--standard ...")   ← WRONG — missing prefix
-/deep-interview --standard ...             ← This is for user-level chat, not skill bodies
-```
+
+**Will silently fail — do NOT use:**
+- `Skill("deep-interview", ...)` without the `oh-my-claudecode:` prefix
+- `/deep-interview --standard ...` — this is user-level chat syntax, not valid inside a skill body
 
 The deep-interview skill will take over the conversation, run its Socratic loop, and return when the spec crystallizes. After it returns, proceed immediately to Phase 5.
 
