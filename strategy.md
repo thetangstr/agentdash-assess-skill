@@ -263,29 +263,23 @@ Use these thresholds for the readiness decision:
 
 ---
 
-## Section 7: PDF Export Configuration
+## Section 7: DOCX Export Configuration
 
-For pandoc-based PDF generation:
+Pandoc is a required preflight dependency for DOCX generation:
 
 ```bash
-pandoc .omc/specs/assess-{slug}.md \
-  -o .omc/specs/assess-{slug}.pdf \
-  --pdf-engine=wkhtmltopdf \
+pandoc --version 2>/dev/null | head -1
+```
+
+Export command:
+```bash
+pandoc {runtime_output_dir}/assess-{slug}.md \
+  -o {runtime_output_dir}/assess-{slug}.docx \
   --from=markdown \
   --toc \
   --toc-depth=2 \
+  --reference-doc=default \
   --metadata title="{company_name} - Agentic Workflow Readiness Assessment" \
   --metadata author="AgentDash Consulting" \
   --metadata date="{ISO_date}"
-```
-
-Fallback engine (if wkhtmltopdf unavailable):
-```bash
-pandoc .omc/specs/assess-{slug}.md \
-  -o .omc/specs/assess-{slug}.pdf \
-  --pdf-engine=pdflatex \
-  --from=markdown \
-  --toc --toc-depth=2 \
-  --metadata title="{company_name} - Agentic Workflow Readiness Assessment" \
-  --metadata author="AgentDash Consulting"
 ```

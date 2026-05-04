@@ -1,19 +1,19 @@
 # assess-agentic
 
-Claude Code skill for agentic workflow readiness assessment — delivered as a forward-deployed consulting engagement.
+Claude Code and Codex skill for agentic workflow readiness assessment — delivered as a forward-deployed consulting engagement.
 
 ## What it does
 
 1. **Self-install** — bootstraps itself from GitHub if not yet installed
-2. **Pre-flight check** — verifies OMC (oh-my-claudecode) is installed, guides install if missing
+2. **Pre-flight check** — detects the active host and verifies the matching workflow layer: OMC for Claude Code or OMX for Codex
 3. **Intake** — collects company name, URL, and assessment type (company vs. project)
 4. **Pre-Interview Pulse** — collects desired outcome, success metric, and top 2-3 pain points before the Socratic interview
 5. **Research** — fetches and summarizes the company website, detects industry
 6. **Domain & Competitive Research** — researches latest solutions for the target domain/industry, competitive landscape, peer case studies (Phase 2c — mandatory)
-7. **Deep-interview** — hands off to OMC's `deep-interview` skill with consultant persona framing, business-outcome discipline, and closed-loop architecture probes
-8. **Report** — outputs a structured markdown + JSON readiness report (company portfolio scan or project charter format)
-9. **PDF Export** — generates a client-ready project charter PDF (if pandoc is installed)
-10. **Handoff** — offers execution options (omc-plan, autopilot, refine, or exit)
+7. **Deep-interview** — hands off to the selected runtime's `deep-interview` skill with consultant persona framing, business-outcome discipline, and closed-loop architecture probes
+8. **Report** — preserves the crystallized spec as markdown + JSON
+9. **DOCX Export** — generates a client-ready Word document with required pandoc
+10. **Stop after delivery** — presents the artifacts and does not launch planning or execution
 
 ## The consulting discipline
 
@@ -26,29 +26,42 @@ This skill operates as a Senior Strategy Consultant at AgentDash Consulting. Key
 
 ## Install
 
-```bash
-# One-liner — skill self-installs on first run:
-claude
+Use this skill from either supported host:
 
-# Then just say:
-/assess-agentic
+```bash
+# Claude Code / OMC
+claude
+# Then say: /assess-agentic
+
+# Codex / OMX
+omx --madmax --high
+# Then ask Codex to use assess-agentic
 ```
 
-The skill will detect it's not installed, clone itself from GitHub, update your CLAUDE.md, and prompt you to run again.
+The skill detects whether it is running under Claude Code/OMC or Codex/OMX, installs into the matching skills directory if needed, and prompts you to restart or run it again.
 
 ## Pre-requisites
 
-- **Claude Code** installed
-- **OMC (oh-my-claudecode)** — **required.** The skill will not run without it. Install first:
+- **One supported host**:
+  - Claude Code with **OMC (oh-my-claudecode)**
+  - Codex CLI with **OMX (oh-my-codex)**
+- **OMC install**:
   ```bash
   curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
+  omc setup
   ```
-  The skill performs a hard pre-flight check — if OMC is missing, it stops and prompts you to install before proceeding.
-- **pandoc** (optional) — for PDF export:
+- **OMX install**:
+  ```bash
+  npm install -g @openai/codex oh-my-codex
+  omx setup
+  omx doctor
+  ```
+  The skill performs a hard pre-flight check. If the workflow layer for the active host is missing, it stops and prompts you to install before proceeding.
+- **pandoc** (required) — for DOCX export:
   ```bash
   brew install pandoc
-  brew install --cask wkhtmltopdf  # for best PDF quality
   ```
+  The skill verifies pandoc before intake and stops if DOCX export is not available.
 
 ## Test on a fresh machine (no setup)
 
@@ -56,17 +69,19 @@ The skill will detect it's not installed, clone itself from GitHub, update your 
 # Create a new macOS user account:
 sudo sysadminctl -addUser testuser -password testpass
 
-# Log in as testuser, open Terminal, install Claude Code:
-# https://docs.anthropic.com/en/docs/claude-code/getting-started
+# Log in as testuser, open Terminal, install one supported host:
+# Claude Code + OMC, or Codex CLI + OMX
 
-# Start Claude Code:
+# Claude Code path:
 claude
+# Then say: /assess-agentic
 
-# Just say this:
-/assess-agentic
+# Codex path:
+omx --madmax --high
+# Then ask Codex to use assess-agentic
 
 # The skill will self-install from GitHub, then the pre-flight check
-# will detect OMC is missing and guide the OMC install
+# will detect the active host and guide the matching OMC or OMX install.
 ```
 
 ## Test with Docker
@@ -76,13 +91,11 @@ git clone https://github.com/thetangstr/agentdash-assess-skill.git /tmp/agentdas
 docker build -t assess-skill-test /tmp/agentdash-assess-skill
 docker run -it assess-skill-test
 
-# Inside container — Claude Code is installed, OMC is NOT:
+# Inside container — start the host you want to test:
 claude
+# Then say: /assess-agentic
 
-# Then just say:
-/assess-agentic
-
-# Skill self-installs, pre-flight detects OMC missing, guides install
+# Skill self-installs, pre-flight detects the missing runtime layer, guides install.
 ```
 
 ## Output artifacts
@@ -91,9 +104,9 @@ After a complete assessment, three files are saved:
 
 | File | Description |
 |------|-------------|
-| `.omc/specs/assess-{slug}.md` | Canonical markdown report — company portfolio scan or project charter |
-| `.omc/specs/assess-{slug}.json` | Structured JSON with dimensions breakdown and crystallized spec |
-| `.omc/specs/assess-{slug}.pdf` | Client-ready PDF project charter (if pandoc installed) |
+| `.omc/specs/assess-{slug}.md` or `.omx/specs/assess-{slug}.md` | Canonical markdown spec — company portfolio scan or project charter |
+| `.omc/specs/assess-{slug}.json` or `.omx/specs/assess-{slug}.json` | Structured JSON with dimensions breakdown and crystallized spec |
+| `.omc/specs/assess-{slug}.docx` or `.omx/specs/assess-{slug}.docx` | Client-ready Word document generated by required pandoc |
 
 ## Report formats
 
@@ -130,7 +143,7 @@ cd ~/skills/assess-agentic && git pull
 |------|---------|
 | `SKILL.md` | Main skill definition — intake, research, deep-interview seeding, report generation |
 | `knowledge.md` | Consultant frameworks — persona, interrogation ladder, dimensions, tier classification |
-| `strategy.md` | Report templates — company/project formats, go/no-go criteria, PDF config |
+| `strategy.md` | Report templates — company/project formats, go/no-go criteria, DOCX config |
 | `ROADMAP.md` | Ongoing development tracking — backlog, version history |
 | `CONSULTANT_GUIDE.md` | Quick-start guide for consultants running engagements |
 | `clients/` | Client engagement tracking and sample outputs |
@@ -147,11 +160,7 @@ cd ~/skills/assess-agentic && git pull
 ## Skill pipeline
 
 ```
-assess-agentic → deep-interview → omc-plan → autopilot
+assess-agentic → deep-interview → markdown/json → DOCX
 ```
 
-The skill chains into OMC's standard pipeline after the assessment crystallizes. Handoff options at the end:
-1. **Plan the agentic workflow** — omc-plan --consensus --direct
-2. **Execute a pilot** — autopilot with spec as context
-3. **Refine the assessment** — continue deep-interview to reduce ambiguity
-4. **Save and exit** — keep the spec for later
+The skill stops after generating the stakeholder-ready DOCX. It does not automatically invoke runtime planning or execution tools.

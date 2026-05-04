@@ -16,7 +16,7 @@ Assess an organization for its readiness to design and sustain an agentic workfl
 </Use_When>
 
 <Do_Not_Use_When>
-- User already has a detailed PRD or spec file — use ralph or autopilot directly
+- User already has a detailed PRD or spec file — use the appropriate planning or execution skill directly instead of this assessment workflow
 - User wants competitive intelligence or market research — this is readiness assessment, not market analysis
 - User wants a quick one-question answer — use a direct answer instead
 </Do_Not_Use_When>
@@ -31,59 +31,84 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 - Frame the deep-interview with domain-specific seed context: closed-loop agentic workflow, sustainability, error tolerance
 - Use `--standard` deep-interview depth for most assessments
 - After deep-interview crystallizes, format the spec as a structured markdown report
+- Treat `pandoc` as a required dependency because DOCX is the final deliverable
 - Use the consultant frameworks (knowledge.md) to inform interview framing
 - Use the report templates (strategy.md) to structure the output
 </Execution_Policy>
 
 <Steps>
 
-## Phase 0: Self-install + OMC check
+## Phase 0: Self-install + runtime check
 
-This skill can bootstrap itself. Before starting, check if the skill is installed, and install it if missing, then check for OMC.
+This skill can bootstrap itself. Before starting, check if the skill is installed, and install it if missing, then detect the user's active agent runtime.
 
 ### 0a: Self-install (if needed)
 
-Check if `~/skills/assess-agentic/SKILL.md` exists. If not:
+Check for an installed copy in the host-specific skill directory:
+- Claude Code / OMC: `~/skills/assess-agentic/SKILL.md` or `~/.claude/skills/assess-agentic/SKILL.md`
+- Codex / OMX: `${CODEX_HOME:-~/.codex}/skills/assess-agentic/SKILL.md`
 
+If missing, install for the active host:
+
+**Claude Code / OMC host:**
 1. Create the skills directory: `Bash: mkdir -p ~/skills`
 2. Clone the repo: `Bash: git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/skills/assess-agentic`
 3. Add the import to CLAUDE.md if not already present (check if `~/skills/assess-agentic/SKILL.md` appears in `~/.claude/CLAUDE.md`)
 4. If CLAUDE.md doesn't have the import yet, append the import line to `~/.claude/CLAUDE.md` using `Bash: echo '\n@import ~/skills/assess-agentic/SKILL.md' >> ~/.claude/CLAUDE.md`
 5. Tell the user: "Skill installed. Please run `/assess-agentic` again."
 
+**Codex / OMX host:**
+1. Create the skills directory: `Bash: mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"`
+2. Clone the repo: `Bash: git clone https://github.com/thetangstr/agentdash-assess-skill.git "${CODEX_HOME:-$HOME/.codex}/skills/assess-agentic"`
+3. Tell the user: "Skill installed. Restart Codex, then ask for `assess-agentic` again."
+
 ### 0b: Runtime detection and pre-flight check
 
-**This is a hard gate. There is no limited mode. Either the deep-interview skill is available (via OMC or OMX), or the skill stops.**
+**This is a hard gate. There is no limited mode. Either the deep-interview skill is available through the runtime the user is actually using (OMC for Claude Code, OMX for Codex), or the skill stops.**
 
-**Step 1 — Detect which runtime is available:**
+Runtime choice is based on the active host, not simply on which binaries are installed. Many machines have both `claude` and `codex`; do not choose OMC just because `claude` exists, and do not choose OMX just because `codex` exists.
 
-Check which CLI is running:
+**Step 1 — Detect the active host and matching workflow layer:**
+
+Collect these signals:
 ```
 claude --version 2>/dev/null | head -1
 codex --version 2>/dev/null | head -1
+omc --version 2>/dev/null | head -1
+omx --version 2>/dev/null | head -1
 ```
 
-- If `claude` is found → OMC runtime (oh-my-claudecode)
-- If `codex` is found → OMX runtime (oh-my-codex)
-- If neither → neither OMC nor OMX is installed
+Then select the runtime:
+- If the current agent host is **Claude Code** or the `Skill(...)` tool is available → select **OMC**.
+- If the current agent host is **Codex** or the user invoked this from an OMX-managed Codex session → select **OMX**.
+- If both hosts are installed but the active host is ambiguous, ask one concise question: "Are you running this assessment in Claude Code/OMC or Codex/OMX?"
+- If neither matching workflow layer is installed for the active host, offer to install that layer only.
+
+After selection, set these variables and use them for every later phase:
+- `runtime_name`: `OMC` or `OMX`
+- `runtime_host`: `Claude Code` or `Codex`
+- `runtime_output_dir`: `.omc/specs` for OMC, `.omx/specs` for OMX
+- `deep_interview_invocation`: OMC uses `Skill("oh-my-claudecode:deep-interview", ...)`; OMX uses the Codex in-session skill surface `$deep-interview "..."`
 
 **Step 2 — Check if deep-interview is available:**
 
-For **OMC (claude)**:
+For selected **OMC (Claude Code)**:
 ```
-Skill("oh-my-claude:deep-interview", "--help")
-```
-
-For **OMX (codex)** — invoke via Bash:
-```bash
-$deep-interview --help
+Skill("oh-my-claudecode:deep-interview", "--help")
 ```
 
-If either returns without error, deep-interview is available — skip to Phase 1.
+For selected **OMX (Codex)**:
+```
+omx --version
+omx doctor
+```
+Then verify the in-session skill surface is available before handoff. In Codex, `$deep-interview` is an OMX skill invocation typed into the agent session, not a Bash executable. Do not run `$deep-interview` through Bash unless the local OMX version explicitly exposes it as a command.
+
+If the selected runtime's deep-interview path is available, skip to Phase 1.
 
 **Step 3 — If deep-interview is NOT available, offer install:**
 
-**For OMC:**
+**For selected OMC:**
 ```
 "This skill requires OMC (oh-my-claudecode) with the deep-interview skill. It is not currently installed on this machine. May I install it now?
 
@@ -101,7 +126,7 @@ If either returns without error, deep-interview is available — skip to Phase 1
   ```
   Wait for that to finish.
 
-**For OMX:**
+**For selected OMX:**
 ```
 "This skill requires OMX (oh-my-codex) with the deep-interview skill. It is not currently installed on this machine. May I install it now?
 
@@ -116,19 +141,53 @@ If either returns without error, deep-interview is available — skip to Phase 1
   Wait for it to finish. Then run:
   ```bash
   omx setup
+  omx doctor
   ```
   Wait for that to finish.
 
 **Step 4 — Verify again:**
 
-OMC: `Skill("oh-my-claude:deep-interview", "--help")`
-OMX: `$deep-interview --help` via Bash
+OMC: `Skill("oh-my-claudecode:deep-interview", "--help")`
+OMX: `omx doctor`, then confirm `$deep-interview` is available as a Codex/OMX in-session skill.
 
 If deep-interview is still unavailable after install, report the error and stop. Do not offer limited mode.
 
 **There is no limited mode. There is no manual fallback. If deep-interview is unavailable, the skill stops.**
 
-Proceed to Phase 1 only after deep-interview is confirmed available.
+### 0c: DOCX export dependency check
+
+**`pandoc` is required.** The final deliverable is a DOCX file, so do not collect intake until DOCX export is possible.
+
+Check for pandoc:
+```bash
+pandoc --version 2>/dev/null | head -1
+```
+
+If pandoc is available, continue to Phase 1.
+
+If pandoc is missing, offer to install it before continuing:
+
+**macOS with Homebrew available:**
+```bash
+brew install pandoc
+```
+
+**Debian/Ubuntu Linux:**
+```bash
+sudo apt-get update
+sudo apt-get install -y pandoc
+```
+
+**Other environments:** direct the user to install pandoc from https://pandoc.org/installing.html, then rerun `/assess-agentic`.
+
+After installation, verify again:
+```bash
+pandoc --version 2>/dev/null | head -1
+```
+
+If pandoc is still unavailable, stop and say: "Pandoc is required to export the DOCX deliverable. Install pandoc, then rerun `/assess-agentic`." Do not proceed with markdown-only output.
+
+Proceed to Phase 1 only after deep-interview and pandoc are both confirmed available.
 
 ## Phase 1: Intake
 
@@ -340,21 +399,22 @@ Classify the target agentic workflow on this typology:
 
 ### Invoke deep-interview NOW
 
-**This is a required step. Use the correct invocation syntax for the detected runtime.**
+**This is a required step. Use `runtime_name` from Phase 0. Do not re-detect here.**
 
-**For OMC (claude CLI):**
+**For selected OMC (Claude Code):**
 ```
 Skill("oh-my-claudecode:deep-interview", "--standard <company_name> agentic workflow readiness assessment")
 ```
 
-**For OMX (codex CLI):**
-```bash
+**For selected OMX (Codex):**
+```
 $deep-interview "--standard <company_name> agentic workflow readiness assessment"
 ```
 
 **Will silently fail — do NOT use:**
 - `Skill("deep-interview", ...)` without the `oh-my-claudecode:` prefix
 - `/deep-interview --standard ...` — this is user-level chat syntax, not valid inside a skill body
+- Bash execution of `$deep-interview` in an OMX flow unless the installed OMX version explicitly documents a shell command; `$deep-interview` is normally a Codex in-session skill surface
 
 The deep-interview skill will take over the conversation, run its Socratic loop, and return when the spec crystallizes. After it returns, proceed immediately to Phase 5.
 
@@ -392,11 +452,11 @@ IMPORTANT — business-outcome discipline: When a client states an IT-layer prob
 
 Scope: `assess_project` for project-level, `cos_onboarding` for company-level.
 
-**If the Skill() call returns an error or deep-interview is not available: hard stop. Report the error and exit. Do not proceed.**
+**If the selected runtime invocation returns an error or deep-interview is not available: hard stop. Report the error and exit. Do not proceed.**
 
 ## Phase 4: Wait for deep-interview to complete
 
-When `Skill("oh-my-claudecode:deep-interview", ...)` is invoked from Phase 3, deep-interview takes over the conversation and runs its own Socratic loop internally. This is a blocking call — you wait for it to return.
+When the selected Phase 3 invocation runs, deep-interview takes over the conversation and runs its own Socratic loop internally. This is a blocking call — you wait for it to return.
 
 **What to expect:**
 - deep-interview asks the user questions directly
@@ -404,7 +464,7 @@ When `Skill("oh-my-claudecode:deep-interview", ...)` is invoked from Phase 3, de
 - deep-interview runs until: ambiguity ≤ 0.2, all dimensions ≥ 0.7, round 20 cap, or user exits early
 
 **After deep-interview returns:**
-- Confirm the crystallized spec was produced (saved to `.omc/specs/deep-interview-{slug}.md`)
+- Confirm the crystallized spec was produced (saved to `{runtime_output_dir}/deep-interview-{slug}.md`)
 - Read the final ambiguity score from the spec
 - Proceed to Phase 5
 
@@ -412,23 +472,23 @@ Do not answer questions yourself during this phase. deep-interview handles the i
 
 ## Phase 5: Export to DOCX and deliver
 
-When deep-interview returns, the crystallized spec is at `.omc/specs/deep-interview-{slug}.md`. Read it, then export directly to DOCX for client review. Do not reformat — the spec is already structured. Stop after delivery.
+When deep-interview returns, the crystallized spec is at `{runtime_output_dir}/deep-interview-{slug}.md`. Read it, then export directly to DOCX for client review. Do not reformat — the spec is already structured. Stop after delivery.
 
 **Step 1 — Read the crystallized spec:**
 ```
-Read `.omc/specs/deep-interview-{slug}.md`
+Read `{runtime_output_dir}/deep-interview-{slug}.md`
 ```
 Confirm the file exists and has content.
 
 **Step 2 — Save the raw spec as markdown:**
 ```
-Write to `.omc/specs/assess-{slug}.md` with the content from Step 1
+Write to `{runtime_output_dir}/assess-{slug}.md` with the content from Step 1
 ```
 This preserves the raw spec alongside the DOCX.
 
 **Step 3 — Save the JSON artifact:**
 ```
-Write to `.omc/specs/assess-{slug}.json`
+Write to `{runtime_output_dir}/assess-{slug}.json`
 ```
 (Extract the structured fields from the spec: company, type, dimensions, ambiguity, spec content, timestamp.)
 
@@ -437,10 +497,10 @@ Write to `.omc/specs/assess-{slug}.json`
 pandoc --version 2>/dev/null || echo "not found"
 ```
 
-If pandoc is installed:
+Pandoc was already verified in Phase 0c. Export the DOCX:
 ```bash
-pandoc .omc/specs/assess-{slug}.md \
-  -o .omc/specs/assess-{slug}.docx \
+pandoc {runtime_output_dir}/assess-{slug}.md \
+  -o {runtime_output_dir}/assess-{slug}.docx \
   --from=markdown \
   --toc \
   --toc-depth=2 \
@@ -451,22 +511,15 @@ pandoc .omc/specs/assess-{slug}.md \
   2>&1 || echo "DOCX export failed"
 ```
 
-If pandoc is not installed:
-```bash
-# Try python-docx as fallback
-python3 -c "import docx" 2>/dev/null && echo "python-docx available" || echo "no docx tool"
-```
-
-If neither tool is available, save the markdown only and tell the user:
-> "DOCX export requires pandoc. Install with `brew install pandoc` and re-run `/assess-agentic` to generate the Word document."
+If DOCX export fails, report the pandoc error and stop. Do not silently downgrade to markdown-only delivery.
 
 **Step 5 — Present the deliverable:**
 ```
 "Assessment complete. Your readiness report is ready:
 
-• Markdown spec: .omc/specs/assess-{slug}.md
-• Word document: .omc/specs/assess-{slug}.docx
-• JSON artifact: .omc/specs/assess-{slug}.json
+• Markdown spec: {runtime_output_dir}/assess-{slug}.md
+• Word document: {runtime_output_dir}/assess-{slug}.docx
+• JSON artifact: {runtime_output_dir}/assess-{slug}.json
 
 Share the .docx with your stakeholders for review."
 ```
@@ -478,10 +531,10 @@ Stop here. Do not offer to plan, execute, or refine. The deliverable is the DOCX
 <Tool_Usage>
 - Use `WebFetch` or `Bash` with `curl` for website research
 - Use `AskUserQuestion` for intake collection (structured form, not open Q&A)
-- Use `Skill()` to invoke deep-interview
+- Use `Skill()` to invoke deep-interview only for OMC; use `$deep-interview` as an OMX in-session Codex skill for OMX
 - Use `Read` to load the crystallized spec from deep-interview output
 - Use `Write` to save markdown and JSON artifacts
-- Use `Bash` with `pandoc` for DOCX export
+- Use `Bash` with required `pandoc` for DOCX export
 </Tool_Usage>
 
 <Examples>
@@ -550,7 +603,7 @@ Why good: Never accepted the IT problem as the goal. Converted SharePoint chaos 
 
 <Escalation_And_Stop_Conditions>
 - If the user declines to provide a URL, proceed with company name only (skip research phase)
-- If `Skill("deep-interview", ...)` returns an error or deep-interview is unavailable: **hard stop.** Do not proceed with manual interviewing. Report the error and exit.
+- If the selected runtime's deep-interview invocation returns an error or deep-interview is unavailable: **hard stop.** Do not proceed with manual interviewing. Report the error and exit.
 - If the company has no clear industry signal from the website, note "Industry: Unknown" and proceed
 - Hard stop at deep-interview round 20 regardless of ambiguity
 - If customer asks for Tier 5 with zero agents in production, explicitly downgrade and explain why
@@ -563,11 +616,13 @@ Why good: Never accepted the IT problem as the goal. Converted SharePoint chaos 
 - [ ] Pre-interview pulse collected (business problem, outcome, cost of inaction, DRI, timeline, budget, systems, org size)
 - [ ] Domain & competitive research performed (Phase 2c — mandatory)
 - [ ] Deep-interview seeded with consultant persona + domain-specific framing + closed-loop probes
+- [ ] Active runtime detected and stored (`runtime_name`, `runtime_output_dir`, runtime-specific invocations)
+- [ ] Pandoc dependency verified before intake
 - [ ] Deep-interview completed (or user exited early)
-- [ ] Crystallized spec read from `.omc/specs/deep-interview-{slug}.md`
-- [ ] Markdown saved to `.omc/specs/assess-{slug}.md`
-- [ ] JSON artifact saved to `.omc/specs/assess-{slug}.json`
-- [ ] DOCX exported to `.omc/specs/assess-{slug}.docx`
+- [ ] Crystallized spec read from `{runtime_output_dir}/deep-interview-{slug}.md`
+- [ ] Markdown saved to `{runtime_output_dir}/assess-{slug}.md`
+- [ ] JSON artifact saved to `{runtime_output_dir}/assess-{slug}.json`
+- [ ] DOCX exported to `{runtime_output_dir}/assess-{slug}.docx`
 - [ ] Deliverable presented to user
 </Final_Checklist>
 
