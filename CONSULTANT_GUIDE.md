@@ -5,8 +5,8 @@ This guide helps forward-deployed consultants run a client assessment engagement
 ## Prerequisites
 
 1. **One supported runtime installed**
-   - Claude Code / OMC: `curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash`, then `omc setup`
-   - Codex / OMX: `npm install -g @openai/codex oh-my-codex`, then `omx setup` and `omx doctor`
+   - Claude Code / OMC: `curl -fsSL https://raw.githubusercontent.com/yeachan-heo/oh-my-claudecode/main/install.sh | bash`, then `omc setup`
+   - Codex / OMX: `npm install -g @openai/codex`, then install OMX from https://github.com/Yeachan-Heo/oh-my-codex, then `omx setup` and `omx doctor`
 2. **Assess skill installed** — `/assess-agentic` in Claude Code, or ask Codex/OMX to use `assess-agentic` (self-installs on first run)
 3. **pandoc for DOCX** — `brew install pandoc` (required; the skill verifies this before intake)
 

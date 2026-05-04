@@ -64,7 +64,7 @@ ASSESSMENT BLOCKED — missing required dependency.
 
 This skill requires OMC (oh-my-claudecode) with the deep-interview skill. Install it first:
 
-curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/yeachan-heo/oh-my-claudecode/main/install.sh | bash
 omc setup
 
 Then restart Claude Code and run /assess-agentic again.
@@ -76,7 +76,8 @@ ASSESSMENT BLOCKED — missing required dependency.
 
 This skill requires OMX (oh-my-codex) with the deep-interview skill. Install it first:
 
-npm install -g @openai/codex oh-my-codex
+npm install -g @openai/codex
+# Then install OMX from https://github.com/Yeachan-Heo/oh-my-codex
 omx setup
 omx doctor
 

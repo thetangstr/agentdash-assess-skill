@@ -31,8 +31,8 @@ This skill runs on either Claude Code or Codex CLI:
 
 | Host | Runtime | Install |
 |------|---------|---------|
-| **Claude Code** | OMC (oh-my-claudecode) | `curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash && omc setup` |
-| **Codex CLI** | OMX (oh-my-codex) | `npm install -g @openai/codex oh-my-codex && omx setup && omx doctor` |
+| **Claude Code** | OMC (oh-my-claudecode) | `curl -fsSL https://raw.githubusercontent.com/yeachan-heo/oh-my-claudecode/main/install.sh | bash && omc setup` |
+| **Codex CLI** | OMX (oh-my-codex) | `npm install -g @openai/codex`, then see OMX install docs |
 
 The skill detects the active host at runtime, installs into the matching skills directory if needed, and runs the pre-flight check for the detected runtime layer.
 
@@ -61,11 +61,12 @@ This skill operates as a **Senior Strategy Consultant at AgentDash Consulting**.
 # Install the matching runtime layer first:
 
 # For Claude Code:
-curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/yeachan-heo/oh-my-claudecode/main/install.sh | bash
 omc setup
 
 # For Codex:
-npm install -g @openai/codex oh-my-codex
+npm install -g @openai/codex
+# Then install OMX from https://github.com/Yeachan-Heo/oh-my-codex
 omx setup
 
 # Start the host:
