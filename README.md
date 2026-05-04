@@ -69,6 +69,18 @@ This skill operates as a **Senior Strategy Consultant at AgentDash Consulting**.
 
 ## Quick start
 
+### Prompt invocation (simplest)
+
+Tell Claude Code or Codex directly:
+
+```
+Install https://github.com/thetangstr/agentdash-assess-skill and use it to help me create an assessment for my project (or company).
+```
+
+The skill self-installs and walks you through the full assessment — intake, research, interview, and DOCX deliverable — with no additional setup.
+
+### Manual setup
+
 ```bash
 # Install the matching runtime layer first:
 
