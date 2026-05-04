@@ -69,35 +69,39 @@ This skill operates as a **Senior Strategy Consultant at AgentDash Consulting**.
 
 ## Quick start
 
-### Prompt invocation (simplest)
-
-Tell Claude Code or Codex directly:
-
-```
-Install https://github.com/thetangstr/agentdash-assess-skill and use it to help me create an assessment for my project (or company).
-```
-
-The skill self-installs and walks you through the full assessment — intake, research, interview, and DOCX deliverable — with no additional setup.
-
-### Manual setup
+### 1. Install the skill (one-time)
 
 ```bash
-# Install the matching runtime layer first:
+# Clone into the Claude Code skills directory — callable from anywhere after this:
+git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/.claude/skills/assess-agentic
+```
 
-# For Claude Code:
+### 2. Install the runtime layer
+
+```bash
+# For Claude Code + OMC:
 curl -fsSL https://raw.githubusercontent.com/yeachan-heo/oh-my-claudecode/main/install.sh | bash
 omc setup
 
-# For Codex:
+# For Codex + OMX:
 npm install -g @openai/codex
 # Then install OMX from https://github.com/Yeachan-Heo/oh-my-codex
 omx setup
+```
 
-# Start the host:
-claude        # or: omx --madmax --high
+### 3. Run the assessment
 
-# Run the skill — it self-installs on first run:
+```bash
+claude    # or: omx --madmax --high
+
+# Then tell Claude Code or Codex:
 /assess-agentic
+```
+
+Or use the prompt directly:
+
+```
+Install https://github.com/thetangstr/agentdash-assess-skill and use it to help me create an assessment for my project (or company).
 ```
 
 ## Output artifacts
