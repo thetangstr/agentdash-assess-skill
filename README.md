@@ -65,6 +65,8 @@ This skill operates as a **Senior Strategy Consultant at AgentDash Consulting**.
 | **OMC (Claude Code)** or **OMX (Codex)** | Yes | Hard requirement — skill will not run without the matching runtime layer |
 | **pandoc** | Yes | Required for DOCX export: `brew install pandoc` |
 
+> **First-run install time:** Initial setup of OMC or OMX plus the deep-interview skill can take 5–10 minutes depending on network speed. Subsequent runs are near-instant. Plan accordingly before starting a client session.
+
 ## Quick start
 
 ```bash
