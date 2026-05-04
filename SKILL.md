@@ -211,13 +211,21 @@ Classify the target agentic workflow on this typology:
 
 **Tier-shortcut rejection rule:** If the customer is reaching for Tier 5 with zero agents in production, downgrade to Tier 2 or 3.
 
-### Seed prompt for deep-interview
+### Invoke deep-interview NOW
 
-```
+**This is a required step. You MUST invoke the deep-interview skill. Do not skip to Phase 4.**
+
+Construct and execute this exact invocation:
+
+```bash
 Skill("deep-interview", "--standard <company_name> agentic workflow readiness assessment")
 ```
 
-The `initialIdea` passed to deep-interview should be framed as:
+Use `scope: "assess_project"` for project-level assessments, `scope: "cos_onboarding"` for company-level.
+
+### Seed prompt for deep-interview
+
+The `initialIdea` passed to deep-interview must be framed as:
 
 > "Assess [company name] for readiness to design and sustain an agentic workflow. [company summary from research].
 >
@@ -239,31 +247,36 @@ The `initialIdea` passed to deep-interview should be framed as:
 >
 > IMPORTANT — business-outcome discipline: When a client states an IT-layer problem (e.g., "fix SharePoint", "build a RAG chatbot", "connect to Salesforce"), do not accept it as the goal. Ask: "What business outcome does that support? What does a wrong [answer] cost the business?" Convert every system/integration question into a business-impact question. The goal is never the tool — the goal is the dollar or time outcome the tool enables.
 
-Use `scope: "assess_project"` for project-level assessments, `scope: "cos_onboarding"` for company-level.
+**If the Skill() call returns an error or deep-interview is not available, this is a hard stop. Do not proceed to Phase 4. Report the error to the user and exit.**
 
 ## Phase 4: Interview Loop
 
-Monitor the deep-interview rounds. After each round, show the user:
+**You are now monitoring an active deep-interview session.** The deep-interview skill is running its own Socratic loop. Your job is to relay its questions to the user, apply the business-outcome reframe filter, and relay answers back until the session crystallizes or hits a stop condition.
+
+**After each round from deep-interview, show the user:**
 - Current ambiguity score
 - Which dimension is being targeted
-- The question being asked
+- The question being asked (reframed if needed — see below)
 
-**Operator filter — reframe every question through the business-outcome lens:**
+**Operator reframe filter — apply before every question:**
 
 Before presenting each deep-interview question to the user, apply this check:
 
 1. **Does the question accept an IT-layer answer?** (e.g., "Which system should the agent connect to?", "What data source should it use?")
 2. **If yes, reframe it to business impact:** "Before we name systems — what business outcome is [stated goal] actually blocking? What does a wrong [answer] cost?"
 
-Example transformation:
+**Example transformation:**
 - Deep-interview generates: "Which CRM system should the agent integrate with?"
-- Operator reframes to: "Before we pick a CRM — what decision does the agent need CRM data to make? If the agent returns wrong CRM data, what breaks in the business?"
+- Operator reframes to: "Which CRM?" *(Before we pick a CRM — what business decision does the agent need CRM data for? If it returns wrong data, what breaks?)*
 
-This reframe should be shown as a **brief parenthetical note** after the question, not as a separate step. Example:
+Show the reframed question to the user. Collect their answer and feed it back to deep-interview via the skill's response mechanism.
 
-> "Which CRM system should the agent integrate with?" *(Before we pick a CRM — what business decision does the agent need CRM data for? If it returns wrong data, what breaks?)*
+**Stop conditions:**
+- Deep-interview signals `done: true` (ambiguity ≤ 0.2 or all dimensions ≥ 0.7)
+- User chooses to exit early
+- Round 20 hard cap reached
 
-Continue until `ambiguity ≤ threshold` (0.2) or the user chooses to exit early.
+Do not run your own interview parallel to deep-interview. Do not answer questions yourself. The loop runs through the skill.
 
 ## Phase 5: Report
 
@@ -592,7 +605,7 @@ Why good: Never accepted the IT problem as the goal. Converted SharePoint chaos 
 
 <Escalation_And_Stop_Conditions>
 - If the user declines to provide a URL, proceed with company name only (skip research phase)
-- If deep-interview returns an error, report it and offer to continue with manual context entry
+- If `Skill("deep-interview", ...)` returns an error or deep-interview is unavailable: **hard stop.** Do not proceed with manual interviewing. Report the error and exit.
 - If the company has no clear industry signal from the website, note "Industry: Unknown" and proceed
 - Hard stop at deep-interview round 20 regardless of ambiguity
 - If customer asks for Tier 5 with zero agents in production, explicitly downgrade and explain why
