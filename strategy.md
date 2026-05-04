@@ -278,7 +278,6 @@ pandoc {runtime_output_dir}/assess-{slug}.md \
   --from=markdown \
   --toc \
   --toc-depth=2 \
-  --reference-doc=default \
   --metadata title="{company_name} - Agentic Workflow Readiness Assessment" \
   --metadata author="AgentDash Consulting" \
   --metadata date="{ISO_date}"
