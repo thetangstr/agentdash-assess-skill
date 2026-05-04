@@ -91,6 +91,16 @@ Fetch the company website at the provided URL:
 
 If the URL is unreachable or empty, note it and proceed with the company name only.
 
+## Phase 2b: Pre-Interview Pulse
+
+Before handing off to the deep Socratic interview, collect the big-picture answers that save wasted rounds. Ask these three questions via `AskUserQuestion` — present them as a compact form, not a raw Q&A:
+
+1. **"What's the single most important outcome you want from this agentic workflow?"**
+2. **"What metric tells you it's working? (e.g., deflection rate, hours saved per week, revenue closed, error rate reduced)"**
+3. **"What are the 2-3 biggest pain points this would solve for your team?"**
+
+Capture the answers. These are injected into the Phase 3 seed prompt so the deep-interview starts with real context instead of generic questions.
+
 ## Phase 3: Seed deep-interview
 
 Invoke the `deep-interview` skill with a domain-specific seed. This phase is critical — you must frame the deep-interview with the consultant's forward-deployed engineer persona and the closed-loop agentic workflow assessment framework.
@@ -148,7 +158,14 @@ Skill("deep-interview", "--standard <company_name> agentic workflow readiness as
 
 The `initialIdea` passed to deep-interview should be framed as:
 
-> "Assess [company name] for readiness to design and sustain an agentic workflow. [company summary from research]. The goal is a closed-loop system: autonomous execution, monitoring, feedback, and adaptation. We need to understand the operational context, integration points, error tolerance, success metrics, and organizational capacity to sustain AI agents.
+> "Assess [company name] for readiness to design and sustain an agentic workflow. [company summary from research].
+>
+> Pre-interview pulse answers — do not re-ask these:
+> - Desired outcome: [from Phase 2b]
+> - Success metric: [from Phase 2b]
+> - Top pain points: [from Phase 2b]
+>
+> The goal is a closed-loop system: autonomous execution, monitoring, feedback, and adaptation. We need to understand the operational context, integration points, error tolerance, success metrics, and organizational capacity to sustain AI agents.
 >
 > Framing: We are forward-deployed strategy consultants. The bias is hybridize first (buy commodity primitives, build only the differentiator). The pilot must be a 4–6 week fixed-scope deployment inside the customer's environment. We ship working software, not slides. Ask about specific systems, specific metrics, specific workflows — not generic intentions.
 >
@@ -364,11 +381,50 @@ Also save the raw JSON spec:
 ```
 to `.omc/specs/assess-{slug}.json`.
 
+## Phase 5b: PDF Generation
+
+After saving the markdown report, generate a PDF version using pandoc. This creates a client-ready project charter document.
+
+```bash
+pandoc --version 2>/dev/null || echo "pandoc not installed"
+```
+
+**If pandoc is installed:**
+
+```bash
+pandoc .omc/specs/assess-{slug}.md \
+  -o .omc/specs/assess-{slug}.pdf \
+  --pdf-engine=wkhtmltopdf \
+  --from=markdown \
+  --toc \
+  --toc-depth=2 \
+  --metadata title="{company_name} - Agentic Workflow Readiness Assessment" \
+  --metadata author="AgentDash Consulting" \
+  --metadata date="{ISO_date}" \
+  2>&1 || echo "PDF generation failed, skipping"
+```
+
+**If pandoc is not installed**, skip the PDF and note it in the handoff message:
+> "PDF not available — pandoc is not installed. Install with `brew install pandoc` for PDF export."
+
+**If wkhtmltopdf is not available**, fall back to:
+```bash
+pandoc .omc/specs/assess-{slug}.md \
+  -o .omc/specs/assess-{slug}.pdf \
+  --pdf-engine=pdflatex \
+  --from=markdown \
+  --toc --toc-depth=2 \
+  --metadata title="{company_name} - Agentic Workflow Readiness Assessment" \
+  --metadata author="AgentDash Consulting"
+```
+
+The PDF replaces the raw markdown with a formatted project charter containing: project brief, go/no-go decision, business case, agent architecture, closed-loop design, success metrics table, team/RACI, build list, phased rollout, risk register, and pre-kickoff blockers.
+
 ## Phase 6: Handoff
 
 After the report is saved, present execution options:
 
-> "Your agentic workflow readiness assessment is complete (ambiguity: {score}%). The crystallized spec is saved at `.omc/specs/assess-{slug}.md`. How would you like to proceed?"
+> "Your agentic workflow readiness assessment is complete (ambiguity: {score}%). The crystallized spec is saved at `.omc/specs/assess-{slug}.md`{PDF path if generated}. How would you like to proceed?"
 
 Options:
 1. **Plan the agentic workflow** — Invoke `omc-plan --consensus --direct` with the spec as input
@@ -384,6 +440,7 @@ Options:
 - Use `Skill()` to invoke deep-interview
 - Use `Write` to save the final report and JSON artifact
 - Use `Read` to load the crystallized spec for report formatting
+- Use `Bash` with `pandoc` for PDF generation (with fallback if not installed)
 </Tool_Usage>
 
 <Examples>
@@ -448,10 +505,12 @@ Why good: Honest assessment of organizational readiness, not just what the custo
 <Final_Checklist>
 - [ ] Intake collected (company, URL, type)
 - [ ] Website researched and summary generated
+- [ ] Pre-interview pulse answers collected (desired outcome, metric, pain points)
 - [ ] Deep-interview seeded with consultant persona + domain-specific framing + closed-loop probes
 - [ ] Interview loop completed or user chose early exit
 - [ ] Report saved to `.omc/specs/assess-{slug}.md` (company or project structure)
 - [ ] JSON artifact saved to `.omc/specs/assess-{slug}.json`
+- [ ] PDF generated at `.omc/specs/assess-{slug}.pdf` (if pandoc available)
 - [ ] Handoff options presented
 </Final_Checklist>
 
