@@ -80,12 +80,11 @@ git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/.claude/ski
 
 ```bash
 # For Claude Code + OMC:
-curl -fsSL https://raw.githubusercontent.com/yeachan-heo/oh-my-claudecode/main/install.sh | bash
+npm i -g oh-my-claude-sisyphus@latest
 omc setup
 
 # For Codex + OMX:
-npm install -g @openai/codex
-# Then install OMX from https://github.com/Yeachan-Heo/oh-my-codex
+npm install -g @openai/codex oh-my-codex
 omx setup
 ```
 
