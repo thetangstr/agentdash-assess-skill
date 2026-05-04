@@ -2,7 +2,7 @@
 
 ## Overview
 
-This skill delivers forward-deployed consulting engagements for AI agent adoption readiness. Each assessment produces a crystallized spec ready for execution via `omc-plan` or `autopilot`.
+This skill delivers forward-deployed consulting engagements for AI agent adoption readiness. Each assessment produces a crystallized spec ready for execution through the user's active runtime: OMC (`omc-plan` / `autopilot`) or OMX (`$ralplan` / `$ralph` / `$team`).
 
 ## Current Status
 
@@ -40,7 +40,7 @@ This skill delivers forward-deployed consulting engagements for AI agent adoptio
 ## Skill Pipeline
 
 ```
-assess-agentic → deep-interview → omc-plan → autopilot
+assess-agentic → deep-interview → runtime-specific plan → runtime-specific execute
 ```
 
 After the assessment crystallizes, clients choose their execution path.

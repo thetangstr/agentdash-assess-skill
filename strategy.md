@@ -268,8 +268,8 @@ Use these thresholds for the readiness decision:
 For pandoc-based PDF generation:
 
 ```bash
-pandoc .omc/specs/assess-{slug}.md \
-  -o .omc/specs/assess-{slug}.pdf \
+pandoc {runtime_output_dir}/assess-{slug}.md \
+  -o {runtime_output_dir}/assess-{slug}.pdf \
   --pdf-engine=wkhtmltopdf \
   --from=markdown \
   --toc \
@@ -281,8 +281,8 @@ pandoc .omc/specs/assess-{slug}.md \
 
 Fallback engine (if wkhtmltopdf unavailable):
 ```bash
-pandoc .omc/specs/assess-{slug}.md \
-  -o .omc/specs/assess-{slug}.pdf \
+pandoc {runtime_output_dir}/assess-{slug}.md \
+  -o {runtime_output_dir}/assess-{slug}.pdf \
   --pdf-engine=pdflatex \
   --from=markdown \
   --toc --toc-depth=2 \
