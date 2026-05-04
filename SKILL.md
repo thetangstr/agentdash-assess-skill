@@ -51,24 +51,36 @@ Check if `~/skills/assess-agentic/SKILL.md` exists. If not:
 4. If CLAUDE.md doesn't have the import yet, append the import line to `~/.claude/CLAUDE.md` using `Bash: echo '\n@import ~/skills/assess-agentic/SKILL.md' >> ~/.claude/CLAUDE.md`
 5. Tell the user: "Skill installed. Please run `/assess-agentic` again."
 
-### 0b: OMC pre-flight check
+### 0b: OMC pre-flight check and auto-install
 
-After confirming the skill is installed, verify OMC (oh-my-claudecode) is installed. **This is a hard gate — do not proceed to Phase 1 without OMC.**
+After confirming the skill is installed, verify OMC (oh-my-claudecode) is installed and deep-interview is available. **This is a hard gate — do not proceed to Phase 1 without both.**
 
-1. **Check if OMC is installed**: Try invoking `Skill("omc-reference")` or check if `/oh-my-claudecode` commands work in the current session.
-2. **If OMC is not installed, hard stop.** Do not proceed to Phase 1. Tell the user:
+1. **Check if OMC is installed**: Try invoking `Skill("omc-reference")`. If it succeeds, OMC is available.
 
-> "This skill requires OMC (oh-my-claudecode) to be installed first, because it relies on the `deep-interview` skill for adaptive Socratic requirements gathering. Please install OMC first:
->
-> ```bash
-> curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
-> ```
->
-> After installing OMC, restart your Claude Code session and run `/assess-agentic` again."
+2. **If OMC is NOT installed, install it NOW.** Do not tell the user to install it — run the install command:
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
+   ```
+   This installs OMC including the deep-interview skill. Wait for the install to complete before proceeding.
 
-3. **If OMC is installed but deep-interview is not available**, also hard stop. Tell the user:
+3. **After install, verify deep-interview is available**: Try `Skill("omc-reference")` again. If it returns successfully, OMC is ready.
 
-> "OMC is installed but the `deep-interview` skill was not found. This skill requires the full OMC deep-interview suite. Please ensure OMC is fully installed with: `omc setup`"
+4. **If OMC is installed but deep-interview is not available**, run `omc setup` to install the full skill suite:
+   ```bash
+   omc setup
+   ```
+   Wait for it to complete, then verify again.
+
+5. **Final verification**: Attempt the exact invocation that will be used in Phase 3:
+   ```
+   Skill("oh-my-claude:deep-interview", "--help")
+   ```
+   If this returns without error, deep-interview is confirmed available.
+
+**Hard stop conditions:**
+- If OMC install fails: report the error and do not proceed
+- If deep-interview is unavailable after `omc setup`: report the error and do not proceed
+- Do not proceed to Phase 1 until Step 5 confirms deep-interview is available
 
 Proceed to Phase 1 only after OMC and deep-interview are confirmed available.
 
