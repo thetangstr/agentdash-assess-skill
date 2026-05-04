@@ -31,6 +31,7 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 - Frame the deep-interview with domain-specific seed context: closed-loop agentic workflow, sustainability, error tolerance
 - Use `--standard` deep-interview depth for most assessments
 - After deep-interview crystallizes, format the spec as a structured markdown report
+- Treat `pandoc` as a required dependency because DOCX is the final deliverable
 - Use the consultant frameworks (knowledge.md) to inform interview framing
 - Use the report templates (strategy.md) to structure the output
 </Execution_Policy>
@@ -153,7 +154,40 @@ If deep-interview is still unavailable after install, report the error and stop.
 
 **There is no limited mode. There is no manual fallback. If deep-interview is unavailable, the skill stops.**
 
-Proceed to Phase 1 only after deep-interview is confirmed available.
+### 0c: DOCX export dependency check
+
+**`pandoc` is required.** The final deliverable is a DOCX file, so do not collect intake until DOCX export is possible.
+
+Check for pandoc:
+```bash
+pandoc --version 2>/dev/null | head -1
+```
+
+If pandoc is available, continue to Phase 1.
+
+If pandoc is missing, offer to install it before continuing:
+
+**macOS with Homebrew available:**
+```bash
+brew install pandoc
+```
+
+**Debian/Ubuntu Linux:**
+```bash
+sudo apt-get update
+sudo apt-get install -y pandoc
+```
+
+**Other environments:** direct the user to install pandoc from https://pandoc.org/installing.html, then rerun `/assess-agentic`.
+
+After installation, verify again:
+```bash
+pandoc --version 2>/dev/null | head -1
+```
+
+If pandoc is still unavailable, stop and say: "Pandoc is required to export the DOCX deliverable. Install pandoc, then rerun `/assess-agentic`." Do not proceed with markdown-only output.
+
+Proceed to Phase 1 only after deep-interview and pandoc are both confirmed available.
 
 ## Phase 1: Intake
 
@@ -463,7 +497,7 @@ Write to `{runtime_output_dir}/assess-{slug}.json`
 pandoc --version 2>/dev/null || echo "not found"
 ```
 
-If pandoc is installed:
+Pandoc was already verified in Phase 0c. Export the DOCX:
 ```bash
 pandoc {runtime_output_dir}/assess-{slug}.md \
   -o {runtime_output_dir}/assess-{slug}.docx \
@@ -477,14 +511,7 @@ pandoc {runtime_output_dir}/assess-{slug}.md \
   2>&1 || echo "DOCX export failed"
 ```
 
-If pandoc is not installed:
-```bash
-# Try python-docx as fallback
-python3 -c "import docx" 2>/dev/null && echo "python-docx available" || echo "no docx tool"
-```
-
-If neither tool is available, save the markdown only and tell the user:
-> "DOCX export requires pandoc. Install with `brew install pandoc` and re-run `/assess-agentic` to generate the Word document."
+If DOCX export fails, report the pandoc error and stop. Do not silently downgrade to markdown-only delivery.
 
 **Step 5 — Present the deliverable:**
 ```
@@ -507,7 +534,7 @@ Stop here. Do not offer to plan, execute, or refine. The deliverable is the DOCX
 - Use `Skill()` to invoke deep-interview only for OMC; use `$deep-interview` as an OMX in-session Codex skill for OMX
 - Use `Read` to load the crystallized spec from deep-interview output
 - Use `Write` to save markdown and JSON artifacts
-- Use `Bash` with `pandoc` for DOCX export
+- Use `Bash` with required `pandoc` for DOCX export
 </Tool_Usage>
 
 <Examples>
@@ -590,6 +617,7 @@ Why good: Never accepted the IT problem as the goal. Converted SharePoint chaos 
 - [ ] Domain & competitive research performed (Phase 2c — mandatory)
 - [ ] Deep-interview seeded with consultant persona + domain-specific framing + closed-loop probes
 - [ ] Active runtime detected and stored (`runtime_name`, `runtime_output_dir`, runtime-specific invocations)
+- [ ] Pandoc dependency verified before intake
 - [ ] Deep-interview completed (or user exited early)
 - [ ] Crystallized spec read from `{runtime_output_dir}/deep-interview-{slug}.md`
 - [ ] Markdown saved to `{runtime_output_dir}/assess-{slug}.md`

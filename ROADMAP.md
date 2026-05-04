@@ -2,7 +2,7 @@
 
 ## Overview
 
-This skill delivers forward-deployed consulting engagements for AI agent adoption readiness. Each assessment produces a crystallized spec and stakeholder-ready DOCX through the user's active runtime: OMC for Claude Code or OMX for Codex.
+This skill delivers forward-deployed consulting engagements for AI agent adoption readiness. Each assessment requires pandoc and produces a crystallized spec plus stakeholder-ready DOCX through the user's active runtime: OMC for Claude Code or OMX for Codex.
 
 ## Current Status
 

@@ -265,8 +265,13 @@ Use these thresholds for the readiness decision:
 
 ## Section 7: DOCX Export Configuration
 
-For pandoc-based DOCX generation:
+Pandoc is a required preflight dependency for DOCX generation:
 
+```bash
+pandoc --version 2>/dev/null | head -1
+```
+
+Export command:
 ```bash
 pandoc {runtime_output_dir}/assess-{slug}.md \
   -o {runtime_output_dir}/assess-{slug}.docx \
@@ -277,9 +282,4 @@ pandoc {runtime_output_dir}/assess-{slug}.md \
   --metadata title="{company_name} - Agentic Workflow Readiness Assessment" \
   --metadata author="AgentDash Consulting" \
   --metadata date="{ISO_date}"
-```
-
-Fallback check (if pandoc unavailable):
-```bash
-python3 -c "import docx" 2>/dev/null && echo "python-docx available" || echo "no docx tool"
 ```
