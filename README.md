@@ -26,7 +26,23 @@ This skill operates as a Senior Strategy Consultant at AgentDash Consulting. Key
 
 ## Install
 
-Use this skill from either supported host:
+Install the skill into the canonical folder name, `assess-agentic`. The GitHub repo is named `agentdash-assess-skill`, but the skill name in `SKILL.md` is `assess-agentic`; using the repo name as the folder can create duplicate or ambiguous skill entries.
+
+```bash
+# Codex / OMX
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+git clone https://github.com/thetangstr/agentdash-assess-skill.git \
+  "${CODEX_HOME:-$HOME/.codex}/skills/assess-agentic"
+omx setup --scope user --legacy
+
+# Claude Code / OMC
+mkdir -p "$HOME/skills"
+git clone https://github.com/thetangstr/agentdash-assess-skill.git \
+  "$HOME/skills/assess-agentic"
+printf '\n@import ~/skills/assess-agentic/SKILL.md\n' >> "$HOME/.claude/CLAUDE.md"
+```
+
+Then restart the host and invoke the skill:
 
 ```bash
 # Claude Code / OMC
@@ -38,7 +54,15 @@ omx --madmax --high
 # Then ask Codex to use assess-agentic
 ```
 
-The skill detects whether it is running under Claude Code/OMC or Codex/OMX, installs into the matching skills directory if needed, and prompts you to restart or run it again.
+Fresh-install sanity check:
+
+```bash
+test -f "${CODEX_HOME:-$HOME/.codex}/skills/assess-agentic/SKILL.md" \
+  || test -f "$HOME/skills/assess-agentic/SKILL.md"
+pandoc --version
+```
+
+The skill detects whether it is running under Claude Code/OMC or Codex/OMX and stops early if the matching runtime or required DOCX export dependency is missing.
 
 ## Pre-requisites
 
