@@ -93,13 +93,37 @@ If the URL is unreachable or empty, note it and proceed with the company name on
 
 ## Phase 2b: Pre-Interview Pulse
 
-Before handing off to the deep Socratic interview, collect the big-picture answers that save wasted rounds. Ask these three questions via `AskUserQuestion` — present them as a compact form, not a raw Q&A:
+Before handing off to the deep Socratic interview, establish the business context that keeps the entire engagement grounded. These questions are NOT answered by the consultant — they are answered by the client. Present them as a compact intake form, not a raw Q&A.
 
-1. **"What's the single most important outcome you want from this agentic workflow?"**
-2. **"What metric tells you it's working? (e.g., deflection rate, hours saved per week, revenue closed, error rate reduced)"**
-3. **"What are the 2-3 biggest pain points this would solve for your team?"**
+**Business goal questions:**
 
-Capture the answers. These are injected into the Phase 3 seed prompt so the deep-interview starts with real context instead of generic questions.
+1. **"What business problem are we solving?"**
+   *(What is the actual pain — not the IT symptom, but the business impact? Who is affected and how?)*
+
+2. **"What business outcome do you want?"**
+   *(Describe success in business terms — revenue gained, cost reduced, time saved, errors prevented. Not "we want AI agents". What does winning look like?)*
+
+3. **"What does doing nothing cost you?"**
+   *(What is the ongoing cost of the current problem? Hours lost per week? Revenue leaking? Customers churning? Being beaten by competitors?)*
+
+4. **"Who is the decision maker and DRI for this project?"**
+   *(Who will sign off? Who will run it day-to-day? Without named accountable people, the project will stall.)*
+
+5. **"What is the timeline pressure?"**
+   *(Is there a hard deadline? A trade show, board meeting, or product launch driving this? Or is this exploratory?)*
+
+6. **"What is the budget envelope for the pilot?"**
+   *(Rough range is fine — $5K, $50K, $500K? This shapes whether we recommend build vs. buy vs. hybridize.)*
+
+**Additional context questions:**
+
+7. **"What systems does this workflow touch today?"**
+   *(Name the actual systems — Salesforce, SAP, SharePoint, Slack, etc. Don't worry about correctness, just name what comes to mind.)*
+
+8. **"What is the approximate size of your organization?"**
+   *(Number of employees, revenue range, or industry — helps calibrate the scale of the solution.)*
+
+Collect all answers and inject them into the Phase 3 seed prompt. The deep-interview should never re-ask these — it builds on them.
 
 ## Phase 3: Seed deep-interview
 
@@ -195,10 +219,15 @@ The `initialIdea` passed to deep-interview should be framed as:
 
 > "Assess [company name] for readiness to design and sustain an agentic workflow. [company summary from research].
 >
-> Pre-interview pulse answers — do not re-ask these:
-> - Desired outcome: [from Phase 2b]
-> - Success metric: [from Phase 2b]
-> - Top pain points: [from Phase 2b]
+> Pre-interview pulse answers — do not re-ask these, build on them:
+> - Business problem: [from Phase 2b]
+> - Business outcome desired: [from Phase 2b]
+> - Cost of doing nothing: [from Phase 2b]
+> - Decision maker / DRI: [from Phase 2b]
+> - Timeline pressure: [from Phase 2b]
+> - Budget envelope: [from Phase 2b]
+> - Systems currently in use: [from Phase 2b]
+> - Org size: [from Phase 2b]
 >
 > The goal is a closed-loop system: autonomous execution, monitoring, feedback, and adaptation. We need to understand the operational context, integration points, error tolerance, success metrics, and organizational capacity to sustain AI agents.
 >
@@ -571,7 +600,7 @@ Why good: Never accepted the IT problem as the goal. Converted SharePoint chaos 
 <Final_Checklist>
 - [ ] Intake collected (company, URL, type)
 - [ ] Website researched and summary generated
-- [ ] Pre-interview pulse answers collected (desired outcome, metric, pain points)
+- [ ] Pre-interview pulse collected (business problem, outcome, cost of inaction, DRI, timeline, budget, systems, org size)
 - [ ] Deep-interview seeded with consultant persona + domain-specific framing + closed-loop probes
 - [ ] Interview loop completed or user chose early exit
 - [ ] Report saved to `.omc/specs/assess-{slug}.md` (company or project structure)
