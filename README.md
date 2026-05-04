@@ -131,7 +131,17 @@ cd ~/skills/assess-agentic && git pull
 | `knowledge.md` | Consultant frameworks — persona, interrogation ladder, dimensions, tier classification |
 | `strategy.md` | Report templates — company/project formats, go/no-go criteria, PDF config |
 | `ROADMAP.md` | Ongoing development tracking — backlog, version history |
+| `CONSULTANT_GUIDE.md` | Quick-start guide for consultants running engagements |
+| `clients/` | Client engagement tracking and sample outputs |
 | `Dockerfile` | Fresh-machine testing image |
+
+### clients/ directory
+
+| File | Purpose |
+|------|---------|
+| `clients/README.md` | Engagement lifecycle, tracking schema, privacy guide |
+| `clients/.engagements/engagements.json` | Active engagement records (gitignored) |
+| `clients/examples/sample-assessment.md` | Anonymized sample output for sales demos |
 
 ## Skill pipeline
 

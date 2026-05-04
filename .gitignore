@@ -1,0 +1,15 @@
+# Client engagement data (never commit real client info)
+clients/.engagements/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Build outputs
+*.pdf
+.omc/

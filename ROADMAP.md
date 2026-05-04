@@ -18,6 +18,9 @@ This skill delivers forward-deployed consulting engagements for AI agent adoptio
 - [x] Core skill structure (SKILL.md, README.md, Dockerfile)
 - [x] Consultant frameworks (knowledge.md)
 - [x] Report templates (strategy.md)
+- [x] Client engagement infrastructure (clients/, engagements.json, .gitignore)
+- [x] Sample anonymized assessment (clients/examples/)
+- [x] Consultant quick-start guide (CONSULTANT_GUIDE.md)
 - [ ] Issue #1: Client feedback loop tracking
 - [ ] Issue #2: Assessment versioning and comparison
 
