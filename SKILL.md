@@ -204,7 +204,9 @@ The `initialIdea` passed to deep-interview should be framed as:
 >
 > Framing: We are forward-deployed strategy consultants. The bias is hybridize first (buy commodity primitives, build only the differentiator). The pilot must be a 4–6 week fixed-scope deployment inside the customer's environment. We ship working software, not slides. Ask about specific systems, specific metrics, specific workflows — not generic intentions.
 >
-> The five assessment dimensions are: specificity (30%), systems (25%), success (20%), risk (15%), fit (10%). Probe for closed-loop architecture components (outcome signal, judge, memory, update mechanism) on every workflow. Classify the target tier (1–5) and reject up-tier shortcuts."
+> The five assessment dimensions are: specificity (30%), systems (25%), success (20%), risk (15%), fit (10%). Probe for closed-loop architecture components (outcome signal, judge, memory, update mechanism) on every workflow. Classify the target tier (1–5) and reject up-tier shortcuts.
+>
+> IMPORTANT — business-outcome discipline: When a client states an IT-layer problem (e.g., "fix SharePoint", "build a RAG chatbot", "connect to Salesforce"), do not accept it as the goal. Ask: "What business outcome does that support? What does a wrong [answer] cost the business?" Convert every system/integration question into a business-impact question. The goal is never the tool — the goal is the dollar or time outcome the tool enables.
 
 Use `scope: "assess_project"` for project-level assessments, `scope: "cos_onboarding"` for company-level.
 
@@ -214,6 +216,21 @@ Monitor the deep-interview rounds. After each round, show the user:
 - Current ambiguity score
 - Which dimension is being targeted
 - The question being asked
+
+**Operator filter — reframe every question through the business-outcome lens:**
+
+Before presenting each deep-interview question to the user, apply this check:
+
+1. **Does the question accept an IT-layer answer?** (e.g., "Which system should the agent connect to?", "What data source should it use?")
+2. **If yes, reframe it to business impact:** "Before we name systems — what business outcome is [stated goal] actually blocking? What does a wrong [answer] cost?"
+
+Example transformation:
+- Deep-interview generates: "Which CRM system should the agent integrate with?"
+- Operator reframes to: "Before we pick a CRM — what decision does the agent need CRM data to make? If the agent returns wrong CRM data, what breaks in the business?"
+
+This reframe should be shown as a **brief parenthetical note** after the question, not as a separate step. Example:
+
+> "Which CRM system should the agent integrate with?" *(Before we pick a CRM — what business decision does the agent need CRM data for? If it returns wrong data, what breaks?)*
 
 Continue until `ambiguity ≤ threshold` (0.2) or the user chooses to exit early.
 
