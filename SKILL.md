@@ -213,70 +213,72 @@ Classify the target agentic workflow on this typology:
 
 ### Invoke deep-interview NOW
 
-**This is a required step. You MUST invoke the deep-interview skill. Do not skip to Phase 4.**
+**This is a required step. You MUST invoke the deep-interview skill using the correct OMC prefix. Do not skip to Phase 4.**
 
-Construct and execute this exact invocation:
-
-```bash
-Skill("deep-interview", "--standard <company_name> agentic workflow readiness assessment")
+**Correct invocation syntax:**
+```
+Skill("oh-my-claudecode:deep-interview", "--standard <company_name> agentic workflow readiness assessment")
 ```
 
-Use `scope: "assess_project"` for project-level assessments, `scope: "cos_onboarding"` for company-level.
+**Incorrect (will silently fail):**
+```
+Skill("deep-interview", "--standard ...")   ← WRONG — missing prefix
+/deep-interview --standard ...             ← This is for user-level chat, not skill bodies
+```
+
+The deep-interview skill will take over the conversation, run its Socratic loop, and return when the spec crystallizes. After it returns, proceed immediately to Phase 5.
+
+**Scope:**
+- Project-level assessment: `scope: "assess_project"`
+- Company-level assessment: `scope: "cos_onboarding"`
+
+Pass these as part of the invocation arguments.
 
 ### Seed prompt for deep-interview
 
-The `initialIdea` passed to deep-interview must be framed as:
+The arguments passed to deep-interview become its `{{ARGUMENTS}}` — this IS the initial idea. Frame all Phase 2b context into the arguments:
 
-> "Assess [company name] for readiness to design and sustain an agentic workflow. [company summary from research].
->
-> Pre-interview pulse answers — do not re-ask these, build on them:
-> - Business problem: [from Phase 2b]
-> - Business outcome desired: [from Phase 2b]
-> - Cost of doing nothing: [from Phase 2b]
-> - Decision maker / DRI: [from Phase 2b]
-> - Timeline pressure: [from Phase 2b]
-> - Budget envelope: [from Phase 2b]
-> - Systems currently in use: [from Phase 2b]
-> - Org size: [from Phase 2b]
->
-> The goal is a closed-loop system: autonomous execution, monitoring, feedback, and adaptation. We need to understand the operational context, integration points, error tolerance, success metrics, and organizational capacity to sustain AI agents.
->
-> Framing: We are forward-deployed strategy consultants. The bias is hybridize first (buy commodity primitives, build only the differentiator). The pilot must be a 4–6 week fixed-scope deployment inside the customer's environment. We ship working software, not slides. Ask about specific systems, specific metrics, specific workflows — not generic intentions.
->
-> The five assessment dimensions are: specificity (30%), systems (25%), success (20%), risk (15%), fit (10%). Probe for closed-loop architecture components (outcome signal, judge, memory, update mechanism) on every workflow. Classify the target tier (1–5) and reject up-tier shortcuts.
->
-> IMPORTANT — business-outcome discipline: When a client states an IT-layer problem (e.g., "fix SharePoint", "build a RAG chatbot", "connect to Salesforce"), do not accept it as the goal. Ask: "What business outcome does that support? What does a wrong [answer] cost the business?" Convert every system/integration question into a business-impact question. The goal is never the tool — the goal is the dollar or time outcome the tool enables.
+```
+--standard [company_name] agentic workflow readiness assessment
 
-**If the Skill() call returns an error or deep-interview is not available, this is a hard stop. Do not proceed to Phase 4. Report the error to the user and exit.**
+Pre-interview context — do not re-ask, build on this:
+- Business problem: [from Phase 2b]
+- Business outcome desired: [from Phase 2b]
+- Cost of doing nothing: [from Phase 2b]
+- Decision maker / DRI: [from Phase 2b]
+- Timeline pressure: [from Phase 2b]
+- Budget envelope: [from Phase 2b]
+- Systems in use: [from Phase 2b]
+- Org size: [from Phase 2b]
+- Company research summary: [from Phase 2]
+- Assessment type: [company | project]
 
-## Phase 4: Interview Loop
+Consultant framing: We are forward-deployed strategy consultants. The bias is hybridize first. The pilot must be a 4-6 week fixed-scope deployment. We ship working software, not slides. Ask about specific systems, specific metrics, specific workflows — not generic intentions.
 
-**You are now monitoring an active deep-interview session.** The deep-interview skill is running its own Socratic loop. Your job is to relay its questions to the user, apply the business-outcome reframe filter, and relay answers back until the session crystallizes or hits a stop condition.
+The five assessment dimensions: specificity (30%), systems (25%), success (20%), risk (15%), fit (10%). Probe for closed-loop architecture (outcome signal, judge, memory, update mechanism). Classify the target tier (1-5) and reject up-tier shortcuts.
 
-**After each round from deep-interview, show the user:**
-- Current ambiguity score
-- Which dimension is being targeted
-- The question being asked (reframed if needed — see below)
+IMPORTANT — business-outcome discipline: When a client states an IT-layer problem (e.g., "fix SharePoint", "build a RAG chatbot"), do not accept it as the goal. Ask: "What business outcome does that support? What does a wrong [answer] cost?" The goal is never the tool — the goal is the dollar or time outcome the tool enables.
+```
 
-**Operator reframe filter — apply before every question:**
+Scope: `assess_project` for project-level, `cos_onboarding` for company-level.
 
-Before presenting each deep-interview question to the user, apply this check:
+**If the Skill() call returns an error or deep-interview is not available: hard stop. Report the error and exit. Do not proceed.**
 
-1. **Does the question accept an IT-layer answer?** (e.g., "Which system should the agent connect to?", "What data source should it use?")
-2. **If yes, reframe it to business impact:** "Before we name systems — what business outcome is [stated goal] actually blocking? What does a wrong [answer] cost?"
+## Phase 4: Wait for deep-interview to complete
 
-**Example transformation:**
-- Deep-interview generates: "Which CRM system should the agent integrate with?"
-- Operator reframes to: "Which CRM?" *(Before we pick a CRM — what business decision does the agent need CRM data for? If it returns wrong data, what breaks?)*
+When `Skill("oh-my-claudecode:deep-interview", ...)` is invoked from Phase 3, deep-interview takes over the conversation and runs its own Socratic loop internally. This is a blocking call — you wait for it to return.
 
-Show the reframed question to the user. Collect their answer and feed it back to deep-interview via the skill's response mechanism.
+**What to expect:**
+- deep-interview asks the user questions directly
+- The business-outcome discipline is baked into the seed prompt passed in Phase 3
+- deep-interview runs until: ambiguity ≤ 0.2, all dimensions ≥ 0.7, round 20 cap, or user exits early
 
-**Stop conditions:**
-- Deep-interview signals `done: true` (ambiguity ≤ 0.2 or all dimensions ≥ 0.7)
-- User chooses to exit early
-- Round 20 hard cap reached
+**After deep-interview returns:**
+- Confirm the crystallized spec was produced (saved to `.omc/specs/deep-interview-{slug}.md`)
+- Read the final ambiguity score from the spec
+- Proceed to Phase 5
 
-Do not run your own interview parallel to deep-interview. Do not answer questions yourself. The loop runs through the skill.
+Do not answer questions yourself during this phase. deep-interview handles the interview loop.
 
 ## Phase 5: Report
 
