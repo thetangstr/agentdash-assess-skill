@@ -36,6 +36,18 @@ Every report begins with this block:
 ## Executive Summary
 3–4 sentences: who the customer is, primary opportunity, estimated total impact, recommended starting point.
 
+## Industry & Competitive Context
+From Phase 2c research — 2-3 sentences on the industry's AI adoption curve, notable peer deployments, and competitive pressure.
+
+**Comparable deployments:**
+- {Company/Source}: {what they did} → {measurable outcome}
+- {Company/Source}: {what they did} → {measurable outcome}
+
+**Leading solutions in scope:**
+- {Vendor/Platform}: {key AI capabilities}, {price signal}, {notable customers using it}
+
+**Industry benchmark:** {specific statistic or finding about AI ROI/adoption in this industry}
+
 ## AI Maturity Assessment
 Six dimensions: Use, Data & Infrastructure, Workflow Integration, Agent Deployment, Talent & Culture, Governance.
 [Flag "adoption mirage" if high individual AI usage but no governance/owner/agent experience]
@@ -100,6 +112,19 @@ Top 3–5 risks with AgentDash native controls (budget hard-stop, kill switch, a
 
 ## Project Brief
 [One sentence on what the agent does, on what input, with what output. Named success metric. Named DRI.]
+
+## Domain Technology Landscape
+From Phase 2c research — current state-of-the-art for the target domain.
+
+**Leading solutions:**
+- {Vendor/Platform}: {key AI capabilities}, {price signal}, {notable customers}
+- {Vendor/Platform}: {key AI capabilities}, {price signal}, {notable customers}
+
+**Comparable case studies:**
+- {Company/Source}: {what they did} → {measurable outcome}
+- {Company/Source}: {what they did} → {measurable outcome}
+
+**Key differentiators to probe in interview:** {what makes one approach better than another for this use case}
 
 ## Should You Do This — Go / No-Go Reasoning
 [Direct paragraph anchoring cost of doing nothing, reachable upside, blocking risks, timing]

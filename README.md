@@ -9,10 +9,11 @@ Claude Code skill for agentic workflow readiness assessment — delivered as a f
 3. **Intake** — collects company name, URL, and assessment type (company vs. project)
 4. **Pre-Interview Pulse** — collects desired outcome, success metric, and top 2-3 pain points before the Socratic interview
 5. **Research** — fetches and summarizes the company website, detects industry
-6. **Deep-interview** — hands off to OMC's `deep-interview` skill with consultant persona framing, business-outcome discipline, and closed-loop architecture probes
-7. **Report** — outputs a structured markdown + JSON readiness report (company portfolio scan or project charter format)
-8. **PDF Export** — generates a client-ready project charter PDF (if pandoc is installed)
-9. **Handoff** — offers execution options (omc-plan, autopilot, refine, or exit)
+6. **Domain & Competitive Research** — researches latest solutions for the target domain/industry, competitive landscape, peer case studies (Phase 2c — mandatory)
+7. **Deep-interview** — hands off to OMC's `deep-interview` skill with consultant persona framing, business-outcome discipline, and closed-loop architecture probes
+8. **Report** — outputs a structured markdown + JSON readiness report (company portfolio scan or project charter format)
+9. **PDF Export** — generates a client-ready project charter PDF (if pandoc is installed)
+10. **Handoff** — offers execution options (omc-plan, autopilot, refine, or exit)
 
 ## The consulting discipline
 

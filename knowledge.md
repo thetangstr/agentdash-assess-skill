@@ -130,3 +130,59 @@ When a vendor solution exists for a layer, prefer it over building. The differen
 | L5 (evaluation) | Build or buy — test suites are custom to the domain |
 | L6 (interface) | Buy or combine |
 | L7 (governance) | **Build** — audit trail and budget controls are table stakes |
+
+---
+
+## Domain Research Discipline
+
+**Never propose a solution without knowing the competitive landscape.**
+
+Before the deep interview, research the domain the client is operating in. The research serves two purposes:
+1. **Interview intelligence** — you ask better questions when you know what's available
+2. **Proposal credibility** — you can compare the client's situation to known deployments
+
+### Research Rules
+
+1. **Time-box to 10 minutes.** You need context, not an exhaustive analysis.
+2. **Use two search passes:** one broad ("AI agent {domain} 2026"), one specific ("{known tool} AI features comparison")
+3. **Capture comparable case studies.** Public references with outcomes are gold for ROI arguments.
+4. **Note pricing signals.** If you can't get exact pricing, note "enterprise pricing, typically $X-$Y/month"
+5. **Flag knowledge gaps for the interview.** If you can't find good data on a domain, say so and ask the client what they've found.
+
+### Domain Research Triggers
+
+The moment a client mentions a technology or workflow, research it:
+
+| Client mentions | Research |
+|---|---|
+| "SharePoint" or "knowledge base" | Knowledge management platforms: Notion AI, Confluence AI, Microsoft Copilot, Guru, Atlas — what's state-of-the-art for enterprise RAG? |
+| "Salesforce" or "CRM" | AI agents for CRM: Salesforce Einstein, HubSpot AI, Clari — what's the ROI data? |
+| "customer support" or "service desk" | AI support agents: Intercom Fin, Zendesk AI, Freshdesk Freddy — what deflection rates are realistic? |
+| "contract" or "legal" | Document AI: Kira Systems, Luminance, LawGeex, DocParser — how do leading platforms compare? |
+| "data analysis" or "BI" | AI analytics agents: Microsoft's Copilot for Analytics, Tableau AI, ThoughtSpot, Hex — what productivity gains? |
+| "recruiting" or "HR" | HR AI agents: Paradox, Eightfold, Pymetrics — what's the adoption curve? |
+| "accounting" or "AP" | Finance AI agents: Moody's AI, Bloomberg GPT, Vic.ai, Rossum — what's the accuracy data? |
+| "coding" or "developer" | AI coding agents: Cursor, Copilot Workspace, Codex, Claude Code — what do dev teams report? |
+
+### Industry Research Triggers
+
+For company-level assessments, always research:
+
+1. **Industry AI adoption curve** — Where are companies in this industry on the AI adoption S-curve?
+2. **Peer examples** — Find at least one public case study of AI agent deployment in this industry
+3. **Regulatory signals** — Any industry-specific AI regulations (FinServ, Healthcare, Legal)?
+4. **Competitive pressure** — Is AI adoption a competitive differentiator in this market, or still early?
+5. **Regional patterns** — Any notable regional differences in adoption (e.g., EU companies lagging on AI due to regulation)?
+
+### The Research Brief Format
+
+After research, produce a concise brief for injection into the seed prompt:
+
+```
+**Domain Research:**
+- Brief: {2-3 sentences on current state-of-the-art}
+- Competitive: {Vendor A} ({key differentiator}, {price signal}), {Vendor B} ({...})
+- Case study: {Company/Source} used {approach} to achieve {outcome}
+- Industry benchmark: {specific statistic or finding}
+- Open question: {what to probe in the interview}
+```

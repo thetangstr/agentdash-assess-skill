@@ -185,6 +185,75 @@ Before handing off to the deep Socratic interview, establish the business contex
 
 Collect all answers and inject them into the Phase 3 seed prompt. The deep-interview should never re-ask these — it builds on them.
 
+## Phase 2c: Domain & Competitive Research
+
+**This phase is mandatory. Do not skip it.**
+
+Before seeding the deep interview, the consultant must research the domain, industry, and competitive landscape. This research:
+- Informs the interview questions with current market context
+- Surfaces comparable solutions the client may not know about
+- Identifies industry-specific AI adoption patterns and blockers
+- Reveals competitive pressure that may drive urgency
+
+### For Project-Level Assessments: Domain Technology Research
+
+Research the latest solutions for the specific domain. Use `WebSearch` to find current state-of-the-art.
+
+**Research scope per domain type:**
+
+| If the project involves... | Research these questions |
+|---|---|
+| Knowledge base / document management | What are the leading knowledge management platforms? What AI features do Notion, Confluence, SharePoint, Guru, Atlas offers? How are enterprises doing RAG over enterprise corpora? |
+| Customer support / service desk | What AI agent solutions exist for Zendesk, Freshdesk, Intercom? What deflection rates do leading solutions achieve? |
+| CRM / sales automation | What's the state of AI agents for Salesforce, HubSpot? How does AI CRM data entry work? What's the ROI data? |
+| Data analysis / BI | What are the leading AI analytics agents? How does Microsoft's Copilot for Analytics compare to custom solutions? |
+| Document / contract processing | What are the leading document AI platforms? How do Kira Systems, Leverton, Luminance compare? |
+| Code generation / code review | What's the current state of AI coding agents — Codex, Cursor, Copilot Workspace? What do development teams report as productivity gains? |
+| HR / recruiting | What AI agents exist for resume screening, interview scheduling, onboarding? |
+| Finance / accounting | What AI agents exist for AP automation, reconciliation, audit? What about Moody's, Bloomberg AI? |
+
+**Search format:**
+```
+WebSearch: "{domain} AI agent solution 2026 enterprise" + WebSearch: "{specific tool} AI features comparison"
+```
+
+### For Company-Level Assessments: Industry & Competitive Research
+
+Research the industry context using `WebSearch` and `WebFetch`.
+
+**Research scope:**
+
+1. **Industry context** — What are the major trends? Who are the key players? What does the competitive landscape look like?
+2. **AI adoption benchmarks** — What are companies in this industry reporting for AI agent adoption? What ROI data exists?
+3. **Peer examples** — Find 2-3 public case studies of AI agent projects in this industry
+4. **Regulatory environment** — Any industry-specific regulations affecting AI agent deployment?
+5. **Regional factors** — If multi-region, note relevant regional differences in AI adoption
+
+**Search format:**
+```
+WebSearch: "{industry} AI agent adoption trends 2026"
+WebSearch: "{industry} AI automation case study"
+WebSearch: "{industry} AI ROI statistics"
+```
+
+### Research Output
+
+After research, produce a **Domain Brief** (2-3 sentences) and **Competitive Landscape** (bulleted list) that you inject into the Phase 3 seed prompt.
+
+```
+**Domain Research:**
+- Domain Brief: {2-3 sentence summary of current state-of-the-art}
+- Competitive Landscape:
+  - {Vendor/Platform}: {key AI features}, {approximate pricing}, {notable customers}
+  - {Vendor/Platform}: ...
+- Industry Benchmarks: {2-3 specific statistics or findings}
+- Comparable Case Studies: {1-2 public examples with outcomes if available}
+```
+
+**Important:** Do not spend more than 10 minutes on research. The goal is context for the interview, not an exhaustive analysis. Record what you found and note gaps the deep-interview should probe.
+
+Inject the Domain Research output into the Phase 3 seed prompt. The deep-interview will use this context to ask informed questions about specific tools and comparable solutions.
+
 ## Phase 3: Seed deep-interview
 
 Invoke the `deep-interview` skill with a domain-specific seed. This phase is critical — you must frame the deep-interview with the consultant's forward-deployed engineer persona and the closed-loop agentic workflow assessment framework.
@@ -679,6 +748,7 @@ Why good: Never accepted the IT problem as the goal. Converted SharePoint chaos 
 - [ ] Intake collected (company, URL, type)
 - [ ] Website researched and summary generated
 - [ ] Pre-interview pulse collected (business problem, outcome, cost of inaction, DRI, timeline, budget, systems, org size)
+- [ ] Domain & competitive research performed (Phase 2c — mandatory)
 - [ ] Deep-interview seeded with consultant persona + domain-specific framing + closed-loop probes
 - [ ] Interview loop completed or user chose early exit
 - [ ] Report saved to `.omc/specs/assess-{slug}.md` (company or project structure)
