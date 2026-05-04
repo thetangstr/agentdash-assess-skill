@@ -41,10 +41,10 @@ This skill runs on either Claude Code or Codex CLI:
 
 | Host | Runtime | Install |
 |------|---------|---------|
-| **Claude Code** | OMC (oh-my-claudecode) | `curl -fsSL https://raw.githubusercontent.com/yeachan-heo/oh-my-claudecode/main/install.sh | bash && omc setup` |
-| **Codex CLI** | OMX (oh-my-codex) | `npm install -g @openai/codex`, then see OMX install docs |
+| **Claude Code** | OMC plugin | `/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode` then `/plugin install oh-my-claudecode` |
+| **Codex CLI** | OMX npm package | `npm install -g @openai/codex oh-my-codex` then `omx setup` |
 
-The skill detects the active host at runtime, installs into the matching skills directory if needed, and runs the pre-flight check for the detected runtime layer.
+The skill detects the active host at runtime and runs the pre-flight check for the detected runtime layer.
 
 ## Consulting discipline
 
@@ -78,10 +78,8 @@ git clone https://github.com/thetangstr/agentdash-assess-skill.git ~/.claude/ski
 
 ### 2. Install the runtime layer
 
-Install from the GitHub repos — the README on each page has the full install instructions:
-
-- **OMC (Claude Code):** https://github.com/yeachan-heo/oh-my-claudecode
-- **OMX (Codex):** https://github.com/Yeachan-Heo/oh-my-codex
+- **Claude Code + OMC:** OMC is a Claude Code plugin — install via the `/plugin` commands inside Claude Code. See: https://github.com/yeachan-heo/oh-my-claudecode
+- **Codex CLI + OMX:** OMX is an npm package. See: https://github.com/Yeachan-Heo/oh-my-codex
 
 ### 3. Run the assessment
 
