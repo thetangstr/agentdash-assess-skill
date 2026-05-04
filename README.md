@@ -4,18 +4,28 @@ A forward-deployed consulting engagement skill for agentic workflow readiness as
 
 ## Status
 
-**v1.0 — Feature Complete** (Phase 2c shipped)
+**v1.1 — Formalized** (Phase 0–5 hard gates + unified B2B messaging)
 
-This skill is production-ready for client engagements. Remaining open issues are scoped to human-consultant-only workflows (e.g., multi-session engagement tracking, proposal generation).
+Both assessment types — Company and Project — follow the same five-phase structure with consistent formal messaging. The skill enforces sequential phase gates; no phase is skipped regardless of assessment type.
 
 ## What it does
 
 ```
-Intake → Pre-Interview Pulse → Research → Domain & Competitive Research → Deep-Interview → Report → DOCX Export → Stop after delivery
+Phase 0: Environment Verification
+Phase 1: Client Intake
+Phase 2: Market Research
+Phase 2b: Pre-Interview Context
+Phase 2c: Domain & Competitive Research
+Phase 3: Deep-Interview (Socratic)
+Phase 4: Interview Completion
+Phase 5: DOCX Export & Client Delivery
 ```
+
+The same five-phase structure applies to both assessment types — Company and Project. The only differences are the research scope (industry vs. domain) and the deep-interview scope argument passed to the runtime.
 
 | Phase | Description |
 |-------|-------------|
+| **Phase 0** | Verifies OMC or OMX, deep-interview skill, and pandoc — hard fail if any are missing |
 | **Intake** | Collects company name, URL, industry, and assessment type (company portfolio scan or project charter) |
 | **Pre-Interview Pulse** | Captures desired outcome, success metrics, and top 2–3 pain points before the Socratic loop |
 | **Research** | Fetches and summarizes the company website; detects industry and competitive context |
