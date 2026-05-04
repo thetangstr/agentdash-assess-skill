@@ -40,6 +40,8 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 
 ## Phase 0: Self-install + runtime check
 
+**Gate: This phase must complete fully before any other phase begins. The skill cannot proceed without these dependencies.**
+
 This skill can bootstrap itself. Before starting, check if the skill is installed, and install it if missing, then detect the user's active agent runtime.
 
 ### 0a: Self-install (if needed)
@@ -187,9 +189,13 @@ pandoc --version 2>/dev/null | head -1
 
 If pandoc is still unavailable, stop and say: "Pandoc is required to export the DOCX deliverable. Install pandoc, then rerun `/assess-agentic`." Do not proceed with markdown-only output.
 
-Proceed to Phase 1 only after deep-interview and pandoc are both confirmed available.
+**Phase 0 complete gate:** Proceed to Phase 1 only after deep-interview and pandoc are both confirmed available.
+
+---
 
 ## Phase 1: Intake
+
+**Gate: Phase 0 must be fully complete before starting Phase 1.**
 
 Collect these fields from the user using `AskUserQuestion`:
 
@@ -200,7 +206,13 @@ Collect these fields from the user using `AskUserQuestion`:
 
 Present them as a concise intake form, not a raw Q&A.
 
+**Phase 1 complete gate:** Proceed to Phase 2 only after all intake fields are collected and confirmed.
+
+---
+
 ## Phase 2: Research
+
+**Gate: Phase 1 must be fully complete before starting Phase 2.**
 
 Fetch the company website at the provided URL:
 - Use `WebFetch` or a bash `curl` call to retrieve the HTML
@@ -210,7 +222,13 @@ Fetch the company website at the provided URL:
 
 If the URL is unreachable or empty, note it and proceed with the company name only.
 
+**Phase 2 complete gate:** Before handing off to Phase 2b, confirm the research summary is written and ready to inject into Pre-Interview Pulse.
+
+---
+
 ## Phase 2b: Pre-Interview Pulse
+
+**Gate: Phase 2 must be fully complete before starting Phase 2b. Do not begin this phase until the Phase 2 research summary is available.**
 
 Before handing off to the deep Socratic interview, establish the business context that keeps the entire engagement grounded. These questions are NOT answered by the consultant — they are answered by the client. Present them as a compact intake form, not a raw Q&A.
 
@@ -242,9 +260,13 @@ Before handing off to the deep Socratic interview, establish the business contex
 8. **"What is the approximate size of your organization?"**
    *(Number of employees, revenue range, or industry — helps calibrate the scale of the solution.)*
 
-Collect all answers and inject them into the Phase 3 seed prompt. The deep-interview should never re-ask these — it builds on them.
+**Phase 2b complete gate:** All 8 questions must be answered and confirmed before proceeding. Collect all answers and inject them into the Phase 3 seed prompt. The deep-interview should never re-ask these — it builds on them.
+
+---
 
 ## Phase 2c: Domain & Competitive Research
+
+**Gate: Phase 2b must be fully complete before starting Phase 2c. This phase is mandatory — do not skip or abbreviate it.**
 
 **This phase is mandatory. Do not skip it.**
 
@@ -311,9 +333,13 @@ After research, produce a **Domain Brief** (2-3 sentences) and **Competitive Lan
 
 **Important:** Do not spend more than 10 minutes on research. The goal is context for the interview, not an exhaustive analysis. Record what you found and note gaps the deep-interview should probe.
 
-Inject the Domain Research output into the Phase 3 seed prompt. The deep-interview will use this context to ask informed questions about specific tools and comparable solutions.
+**Phase 2c complete gate:** The Domain Research output must be written out and confirmed before invoking Phase 3. Inject the Domain Research output into the Phase 3 seed prompt. The deep-interview will use this context to ask informed questions about specific tools and comparable solutions.
+
+---
 
 ## Phase 3: Seed deep-interview
+
+**Gate: Phase 2c must be fully complete — all 8 Pre-Interview Pulse answers collected, Domain Research output written — before invoking deep-interview. Do not invoke deep-interview until Phases 1, 2, 2b, and 2c are all confirmed complete.**
 
 Invoke the `deep-interview` skill with a domain-specific seed. This phase is critical — you must frame the deep-interview with the consultant's forward-deployed engineer persona and the closed-loop agentic workflow assessment framework.
 
@@ -399,6 +425,8 @@ Classify the target agentic workflow on this typology:
 
 ### Invoke deep-interview NOW
 
+**Gate: Only invoke deep-interview after Phases 1, 2, 2b, and 2c are ALL confirmed complete. The seed prompt requires all prior phase outputs — do not invoke without them.**
+
 **This is a required step. Use `runtime_name` from Phase 0. Do not re-detect here.**
 
 **For selected OMC (Claude Code):**
@@ -454,7 +482,11 @@ Scope: `assess_project` for project-level, `cos_onboarding` for company-level.
 
 **If the selected runtime invocation returns an error or deep-interview is not available: hard stop. Report the error and exit. Do not proceed.**
 
+---
+
 ## Phase 4: Wait for deep-interview to complete
+
+**Gate: This phase begins immediately after Phase 3 invocation. Do not proceed to Phase 5 until deep-interview explicitly returns.**
 
 When the selected Phase 3 invocation runs, deep-interview takes over the conversation and runs its own Socratic loop internally. This is a blocking call — you wait for it to return.
 
@@ -470,7 +502,11 @@ When the selected Phase 3 invocation runs, deep-interview takes over the convers
 
 Do not answer questions yourself during this phase. deep-interview handles the interview loop.
 
+---
+
 ## Phase 5: Export to DOCX and deliver
+
+**Gate: Phase 4 must complete (deep-interview must return) before starting Phase 5.**
 
 When deep-interview returns, the crystallized spec is at `{runtime_output_dir}/deep-interview-{slug}.md`. Read it, then export directly to DOCX for client review. Do not reformat — the spec is already structured. Stop after delivery.
 
