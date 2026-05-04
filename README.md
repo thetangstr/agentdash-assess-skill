@@ -123,6 +123,16 @@ cd ~/skills/assess-agentic && git pull
 # Restart Claude Code session to pick up changes
 ```
 
+## Project structure
+
+| File | Purpose |
+|------|---------|
+| `SKILL.md` | Main skill definition — intake, research, deep-interview seeding, report generation |
+| `knowledge.md` | Consultant frameworks — persona, interrogation ladder, dimensions, tier classification |
+| `strategy.md` | Report templates — company/project formats, go/no-go criteria, PDF config |
+| `ROADMAP.md` | Ongoing development tracking — backlog, version history |
+| `Dockerfile` | Fresh-machine testing image |
+
 ## Skill pipeline
 
 ```
