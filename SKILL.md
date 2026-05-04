@@ -26,131 +26,110 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 </Why_This_Exists>
 
 <Execution_Policy>
+- Prerequisites (OMC/OMX, deep-interview, pandoc) MUST be installed BEFORE running this skill — do not attempt to install them inside the skill
+- If any prerequisite is missing, stop immediately and display the blocking message — do not proceed, do not offer to install
 - Collect intake FIRST, then hand off to deep-interview — do not skip intake
 - Use the company URL to fetch and summarize the website before seeding deep-interview
 - Frame the deep-interview with domain-specific seed context: closed-loop agentic workflow, sustainability, error tolerance
 - Use `--standard` deep-interview depth for most assessments
 - After deep-interview crystallizes, format the spec as a structured markdown report
-- Treat `pandoc` as a required dependency because DOCX is the final deliverable
+- pandoc is required for DOCX export — fail hard if missing before intake
 - Use the consultant frameworks (knowledge.md) to inform interview framing
 - Use the report templates (strategy.md) to structure the output
 </Execution_Policy>
 
 <Steps>
 
-## Phase 0: Dependency installation — blocking gate
+## Phase 0: Prerequisites — hard fail if missing
 
-**STOP. Do not proceed to Phase 1, 2, or any other phase until ALL steps in Phase 0 are complete.**
+**Prerequisites must be installed BEFORE running this skill. Do not attempt to install them inside the skill.**
 
-This skill requires three dependencies to be installed and verified before any assessment work begins. This is a hard sequence — each step must fully complete before the next begins.
+### Step 1: Detect and verify prerequisites
 
-### Step 1: Detect active host
+Run all of these and wait for results:
 
-Run these commands and wait for all results:
 ```
-claude --version 2>/dev/null | head -1
-codex --version 2>/dev/null | head -1
 omc --version 2>/dev/null | head -1
 omx --version 2>/dev/null | head -1
+pandoc --version 2>/dev/null | head -1
 ```
 
-Determine the active runtime:
-- If Claude Code is running (the `Skill(...)` tool is available) → **OMC**
-- If Codex CLI is running → **OMX**
-- If ambiguous, ask: "Are you running Claude Code or Codex CLI?"
+### Step 2: Fail if prerequisites are missing
 
-Set and record these variables for all later phases:
-- `runtime`: `OMC` or `OMX`
-- `runtime_host`: `Claude Code` or `Codex`
-- `runtime_output_dir`: `.omc/specs` for OMC, `.omx/specs` for OMX
+**If any prerequisite is missing, say EXACTLY the message below and stop. Do not attempt to install. Do not proceed.**
 
-### Step 2: Install OMC or OMX if missing
-
-**This step blocks. Do not proceed until the runtime is installed and verified.**
-
-**For OMC — if not installed or not confirmed:**
+If OMC is missing:
 ```
-OMC is required. Installing it now.
-```
-Run:
-```bash
+ASSESSMENT BLOCKED — missing required dependency.
+
+This skill requires OMC (oh-my-claudecode) with the deep-interview skill. Install it first:
+
 curl -fsSL https://raw.githubusercontent.com/oh-my-claude/oh-my-claude/main/install.sh | bash
-```
-Wait for completion. Then:
-```bash
 omc setup
-```
-Wait for completion.
 
-Verify with:
-```
-omc --version
+Then restart Claude Code and run /assess-agentic again.
 ```
 
-**For OMX — if not installed or not confirmed:**
+If OMX is missing:
 ```
-OMX is required. Installing it now.
-```
-Run:
-```bash
+ASSESSMENT BLOCKED — missing required dependency.
+
+This skill requires OMX (oh-my-codex) with the deep-interview skill. Install it first:
+
 npm install -g @openai/codex oh-my-codex
-```
-Wait for completion. Then:
-```bash
 omx setup
 omx doctor
-```
-Wait for completion.
 
-Verify with:
-```
-omx --version
+Then restart Codex and run /assess-agentic again.
 ```
 
-**Do not proceed to Step 3 until the selected runtime is confirmed installed.**
-
-### Step 3: Verify deep-interview skill is available
-
-**This step blocks. Do not proceed until deep-interview is confirmed available.**
-
-**For OMC:**
+If pandoc is missing:
 ```
-Skill("oh-my-claudecode:deep-interview", "--help")
-```
-If this fails, the installation did not work. Report the error and stop.
+ASSESSMENT BLOCKED — missing required dependency.
 
-**For OMX:**
+This skill requires pandoc for DOCX export. Install it first:
+
+macOS:  brew install pandoc
+Linux:  sudo apt-get install pandoc
+Other:  https://pandoc.org/installing.html
+
+Then run /assess-agentic again.
 ```
+
+If deep-interview is not available in OMC:
+```
+ASSESSMENT BLOCKED — deep-interview skill not found.
+
+OMC is installed but the deep-interview skill is not available. Run:
+
+omc setup
+
+Then restart Claude Code and run /assess-agentic again.
+```
+
+If deep-interview is not available in OMX:
+```
+ASSESSMENT BLOCKED — deep-interview skill not found.
+
+OMX is installed but the deep-interview skill is not available. Run:
+
+omx setup
 omx doctor
-```
-Confirm that `$deep-interview` is listed as an available in-session skill.
 
-**If deep-interview is unavailable after install attempts: stop. Report the error. Do not offer a workaround or limited mode.**
-
-### Step 4: Install pandoc for DOCX export
-
-**This step blocks. Do not proceed until pandoc is installed and verified.**
-
-Check:
-```bash
-pandoc --version 2>/dev/null | head -1
+Then restart Codex and run /assess-agentic again.
 ```
 
-If not found, install:
-- **macOS:** `brew install pandoc`
-- **Linux (apt):** `sudo apt-get update && sudo apt-get install -y pandoc`
-- **Other:** https://pandoc.org/installing.html
+**Do not proceed past this point if any prerequisite is missing.**
 
-Verify after installation:
-```bash
-pandoc --version 2>/dev/null | head -1
-```
+### Step 3: Set runtime variables
 
-**If pandoc cannot be installed or verified: stop. Report that DOCX export is required and cannot proceed without it.**
+Based on which runtime is available:
+- If OMC is installed and deep-interview works → `runtime=OMC`, `runtime_host=Claude Code`, `runtime_output_dir=.omc/specs`
+- If OMX is installed and deep-interview works → `runtime=OMX`, `runtime_host=Codex`, `runtime_output_dir=.omx/specs`
 
 ---
 
-**Phase 0 complete gate:** Only proceed to Phase 1 after ALL four steps above are verified complete — active host detected, runtime installed and verified, deep-interview available, and pandoc installed and verified.
+**Phase 0 complete gate:** Only proceed to Phase 1 if ALL prerequisites are confirmed present. If any are missing, stop and display the exact blocking message above.
 
 ---
 
@@ -607,9 +586,8 @@ Why good: Never accepted the IT problem as the goal. Converted SharePoint chaos 
 </Escalation_And_Stop_Conditions>
 
 <Final_Checklist>
-- [ ] **Phase 0 — ALL dependencies confirmed installed and verified before any assessment work begins:**
-  - [ ] Active host detected (OMC or OMX)
-  - [ ] OMC or OMX runtime installed and verified
+- [ ] **Phase 0 — Prerequisites confirmed present (FAIL HARD if any missing):**
+  - [ ] OMC or OMX installed and verified
   - [ ] deep-interview skill confirmed available through selected runtime
   - [ ] pandoc installed and verified
 - [ ] Intake collected (company, URL, type)
