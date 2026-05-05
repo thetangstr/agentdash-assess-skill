@@ -82,13 +82,14 @@ Required runtime not found. This assessment requires one of:
 Installation:
 
   For Claude Code + OMC:
-  curl -fsSL https://raw.githubusercontent.com/yeachan-heo/oh-my-claudecode/main/install.sh | bash
-  omc setup
+    Inside Claude Code, run:
+      /plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode
+      /plugin install oh-my-claudecode
+    Then restart Claude Code.
 
   For Codex + OMX:
-  npm install -g @openai/codex
-  See: https://github.com/Yeachan-Heo/oh-my-codex
-  omx setup && omx doctor
+    npm install -g @openai/codex oh-my-codex && omx setup
+    See: https://github.com/Yeachan-Heo/oh-my-codex
 
 Restart the host application and invoke /assess-agentic to continue.
 ```
