@@ -69,34 +69,42 @@ After all checks complete, handle each missing item.
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OMC NOT FOUND — Installing OMC
+OMC NOT FOUND — Two-Step Install
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Running the OMC installer. Follow the prompts in the terminal.
-This takes a few minutes on first run.
+Step 1: Installing OMC package now (takes 2-5 minutes on first run)...
 ```
 
-Then run via Bash:
+Run via Bash:
 ```
-npm i -g oh-my-claude-sisyphus@latest && omc setup
+npm i -g oh-my-claude-sisyphus@latest
 ```
-The `omc setup` wizard is interactive — the user will make choices at the terminal.
+
+**Important:** After the npm install completes, you must run `omc setup`
+in a **separate terminal** — the skill cannot run it from inside
+Claude Code. Then confirm below.
+
+After npm install completes, ask the user to confirm they've
+run `omc setup` in a separate terminal, then proceed to
+Step 4 to verify deep-interview.
 
 **If OMX is not found:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OMX NOT FOUND — Installing OMX
+OMX NOT FOUND — Two-Step Install
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Running the OMX installer. Follow the prompts in the terminal.
+Step 1: Installing OMX package now...
 ```
 
-Then run via Bash:
+Run via Bash:
 ```
-npm install -g @openai/codex oh-my-codex && omx setup
+npm install -g @openai/codex oh-my-codex
 ```
-The `omx setup` wizard is interactive — the user will make choices at the terminal.
+
+After npm install completes, ask the user to run `omx setup`
+in a **separate terminal**, then confirm below.
 
 **If pandoc is not found:**
 
@@ -120,10 +128,16 @@ Options (via AskUserQuestion):
 deep-interview NOT FOUND
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-The deep-interview skill is not available for the active runtime.
+The deep-interview skill is not available yet.
+Please run the setup in a separate terminal, then confirm below.
 ```
 
-Run `omc setup` or `omx setup` again via Bash to refresh skills.
+Use `AskUserQuestion`:
+1. **I've run `omc setup` / `omx setup` in a separate terminal — continue**
+2. **Show instructions** — display: `omc setup` (OMC) or `omx setup` (OMX)
+3. **Cancel and exit**
+
+If user confirms, recheck deep-interview availability.
 
 **If all prerequisites are confirmed present:** Proceed to Step 4.
 
@@ -133,7 +147,7 @@ For OMC: Run `omc skills list 2>/dev/null | grep deep-interview`.
 
 For OMX: Run `omx skills list 2>/dev/null | grep deep-interview`.
 
-If deep-interview still not found after setup, present the manual install instructions and ask to rerun `omc setup` or `omx setup`.
+If deep-interview still not found, go back to the deep-interview not found step above and ask user to run setup.
 
 ### Step 5: Set runtime context
 
