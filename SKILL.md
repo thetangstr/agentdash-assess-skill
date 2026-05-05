@@ -42,11 +42,11 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 
 ## Phase 0: Environment Verification
 
-**Policy:** All prerequisites must be installed and verified before this skill begins. The skill will not install dependencies or offer alternatives. If any requirement is absent, execution halts immediately with explicit instructions.
+**Policy:** Check all prerequisites first. If anything is missing, use `AskUserQuestion` to present options — do not just output text and exit. Wait for the user's response before proceeding or stopping.
 
 ### Step 1: Detect active runtime
 
-Execute both verification commands in parallel and wait for results:
+Execute both detection commands in parallel:
 
 ```
 omc --version 2>/dev/null | head -1
@@ -55,88 +55,77 @@ omx --version 2>/dev/null | head -1
 
 ### Step 2: Verify required executables
 
-Execute the following in parallel:
+Execute in parallel:
 
 ```
 pandoc --version 2>/dev/null | head -1
 ```
 
-### Step 3: Conditional blocking messages
+### Step 3: Check deep-interview availability
 
-**If OMC is detected and verified:** Note `runtime=OMC` and `runtime_host=Claude Code`. Proceed to Step 4.
+**For OMC:** Run `omc skills list 2>/dev/null` or equivalent.
 
-**If OMX is detected and verified:** Note `runtime=OMX` and `runtime_host=Codex`. Proceed to Step 4.
+**For OMX:** Run `omx skills list 2>/dev/null` or equivalent.
 
-**If neither OMC nor OMX is detected:** Stop immediately. Output the following message verbatim and exit:
+### Step 4: Present any missing prerequisites via AskUserQuestion
 
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ASSESSMENT BLOCKED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After all checks complete, determine what is missing. For each missing prerequisite, use `AskUserQuestion` to present options — do not just output text and exit.
 
-Required runtime not found. This assessment requires one of:
-
-  • Claude Code with OMC (oh-my-claudecode)
-  • Codex CLI with OMX (oh-my-codex)
-
-Installation:
-
-  For Claude Code + OMC:
-    Inside Claude Code, run:
-      /plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode
-      /plugin install oh-my-claudecode
-    Then restart Claude Code.
-
-  For Codex + OMX:
-    npm install -g @openai/codex oh-my-codex && omx setup
-    See: https://github.com/Yeachan-Heo/oh-my-codex
-
-Restart the host application and invoke /assess-agentic to continue.
-```
-
-**If pandoc is not detected:** Stop immediately. Output the following message verbatim and exit:
+**If OMC and OMX are both missing:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ASSESSMENT BLOCKED — DOCX Export Unavailable
+ASSESSMENT PREREQUISITES — OMC/OMX Not Found
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-pandoc is not installed. This assessment requires pandoc for
-client-deliverable Word document generation.
+This assessment requires a runtime layer to run the deep-interview phase.
 
-Installation:
+  • OMC (Claude Code): Claude Code plugin — installed via /plugin
+  • OMX (Codex): npm package — installed via npm
 
-  macOS:   brew install pandoc
-  Linux:   sudo apt-get install pandoc
-  Windows: https://pandoc.org/installing.html
-
-After installation, restart and invoke /assess-agentic to continue.
+Which would you like to do?
 ```
 
-### Step 4: Verify deep-interview skill availability
+Options:
+1. **Show install instructions** — Display instructions and ask to rerun the check
+2. **Cancel and exit** — Exit the assessment
 
-**For OMC:** Execute `omc skills list 2>/dev/null` or equivalent and check for `deep-interview`.
-
-**For OMX:** Execute `omx skills list 2>/dev/null` or equivalent and check for `deep-interview`.
-
-**If deep-interview is not found:** Stop immediately. Output the following message verbatim and exit:
+**If pandoc is missing:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ASSESSMENT BLOCKED — Skill Not Available
+ASSESSMENT PREREQUISITES — pandoc Not Found
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-The required skill "deep-interview" is not installed
-for the active runtime.
+pandoc is required to generate the DOCX client deliverable.
+Markdown and JSON outputs will still be produced.
 
-For OMC (Claude Code):
-  omc setup
-
-For OMX (Codex):
-  omx setup && omx doctor
-
-Restart the host application and invoke /assess-agentic to continue.
+Which would you like to do?
 ```
+
+Options:
+1. **Show install instructions** — Display instructions and ask to rerun the check
+2. **Skip DOCX export** — Continue without DOCX; markdown and JSON will still be produced
+3. **Cancel and exit** — Exit the assessment
+
+**If deep-interview is missing:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ASSESSMENT PREREQUISITES — deep-interview Not Found
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The deep-interview skill is not installed for the active runtime.
+This is a required component — the assessment cannot continue without it.
+
+Which would you like to do?
+```
+
+Options:
+1. **Show install instructions** — Display instructions and ask to rerun the check
+2. **Cancel and exit** — Exit the assessment
+
+**If all prerequisites are confirmed present:** Proceed to Step 5.
 
 ### Step 5: Set runtime context
 
@@ -150,7 +139,7 @@ Record the following variables for subsequent phases:
 
 ---
 
-**Phase 0 Complete Gate:** Proceed only when all of the following are confirmed: (a) OMC or OMX is active, (b) deep-interview skill is available, (c) pandoc is installed. If any confirmation fails, stop and display the appropriate blocking message above.
+**Phase 0 Complete Gate:** Proceed to Phase 1 only when a runtime (OMC or OMX) is confirmed, the deep-interview skill is available, and the user has chosen how to handle pandoc (install or skip). Use `AskUserQuestion` at each missing prerequisite — do not exit silently.
 
 ---
 
