@@ -26,14 +26,13 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 </Why_This_Exists>
 
 <Execution_Policy>
-- Prerequisites (OMC/OMX, deep-interview, pandoc) MUST be installed BEFORE running this skill — do not attempt to install them inside the skill
-- If any prerequisite is missing, stop immediately and display the blocking message — do not proceed, do not offer to install
+- Phase 0 detects all prerequisites. If any are missing, the skill attempts installation via Bash (npm, omc setup, omx setup). For omc setup / omx setup the user must run these in a separate terminal — the skill will prompt and wait.
 - Collect intake FIRST, then hand off to deep-interview — do not skip intake
 - Use the company URL to fetch and summarize the website before seeding deep-interview
 - Frame the deep-interview with domain-specific seed context: closed-loop agentic workflow, sustainability, error tolerance
 - Use `--standard` deep-interview depth for most assessments
 - After deep-interview crystallizes, format the spec as a structured markdown report
-- pandoc is required for DOCX export — fail hard if missing before intake
+- pandoc is required for DOCX export — offer to install or skip, but do not silently continue
 - Use the consultant frameworks (knowledge.md) to inform interview framing
 - Use the report templates (strategy.md) to structure the output
 </Execution_Policy>
