@@ -42,11 +42,11 @@ Most agentic workflow failures don't stem from technology — they stem from unc
 
 ## Phase 0: Environment Verification
 
-**Policy:** Check all prerequisites first. If anything is missing, use `AskUserQuestion` to present options — do not just output text and exit. Wait for the user's response before proceeding or stopping.
+**Policy:** Check all prerequisites first. If anything is missing, offer to install it via Bash — the user will interact with the setup wizard if needed. Do not exit silently.
 
 ### Step 1: Detect active runtime
 
-Execute both detection commands in parallel:
+Execute in parallel:
 
 ```
 omc --version 2>/dev/null | head -1
@@ -61,75 +61,83 @@ Execute in parallel:
 pandoc --version 2>/dev/null | head -1
 ```
 
-### Step 3: Check deep-interview availability
+### Step 3: Present missing prerequisites with install options
 
-**For OMC:** Run `omc skills list 2>/dev/null` or equivalent.
+After all checks complete, handle each missing item.
 
-**For OMX:** Run `omx skills list 2>/dev/null` or equivalent.
-
-### Step 4: Present any missing prerequisites via AskUserQuestion
-
-After all checks complete, determine what is missing. For each missing prerequisite, use `AskUserQuestion` to present options — do not just output text and exit.
-
-**If OMC and OMX are both missing:**
+**If OMC is not found:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ASSESSMENT PREREQUISITES — OMC/OMX Not Found
+OMC NOT FOUND — Installing OMC
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-This assessment requires a runtime layer to run the deep-interview phase.
-
-  • OMC (Claude Code): Claude Code plugin — installed via /plugin
-  • OMX (Codex): npm package — installed via npm
-
-Which would you like to do?
+Running the OMC installer. Follow the prompts in the terminal.
+This takes a few minutes on first run.
 ```
 
-Options:
-1. **Show install instructions** — Display instructions and ask to rerun the check
-2. **Cancel and exit** — Exit the assessment
+Then run via Bash:
+```
+npm i -g oh-my-claude-sisyphus@latest && omc setup
+```
+The `omc setup` wizard is interactive — the user will make choices at the terminal.
 
-**If pandoc is missing:**
+**If OMX is not found:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ASSESSMENT PREREQUISITES — pandoc Not Found
+OMX NOT FOUND — Installing OMX
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Running the OMX installer. Follow the prompts in the terminal.
+```
+
+Then run via Bash:
+```
+npm install -g @openai/codex oh-my-codex && omx setup
+```
+The `omx setup` wizard is interactive — the user will make choices at the terminal.
+
+**If pandoc is not found:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PANDOC NOT FOUND
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 pandoc is required to generate the DOCX client deliverable.
-Markdown and JSON outputs will still be produced.
-
-Which would you like to do?
 ```
 
-Options:
-1. **Show install instructions** — Display instructions and ask to rerun the check
-2. **Skip DOCX export** — Continue without DOCX; markdown and JSON will still be produced
-3. **Cancel and exit** — Exit the assessment
+Options (via AskUserQuestion):
+1. **Show install instructions** — Display: `brew install pandoc` (macOS), `sudo apt-get install pandoc` (Linux)
+2. **Skip DOCX** — Continue without DOCX export; markdown and JSON will still be produced
+3. **Cancel and exit**
 
-**If deep-interview is missing:**
+**If deep-interview is not found (after OMC/OMX installed):**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ASSESSMENT PREREQUISITES — deep-interview Not Found
+deep-interview NOT FOUND
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-The deep-interview skill is not installed for the active runtime.
-This is a required component — the assessment cannot continue without it.
-
-Which would you like to do?
+The deep-interview skill is not available for the active runtime.
 ```
 
-Options:
-1. **Show install instructions** — Display instructions and ask to rerun the check
-2. **Cancel and exit** — Exit the assessment
+Run `omc setup` or `omx setup` again via Bash to refresh skills.
 
-**If all prerequisites are confirmed present:** Proceed to Step 5.
+**If all prerequisites are confirmed present:** Proceed to Step 4.
+
+### Step 4: Verify deep-interview is accessible
+
+For OMC: Run `omc skills list 2>/dev/null | grep deep-interview`.
+
+For OMX: Run `omx skills list 2>/dev/null | grep deep-interview`.
+
+If deep-interview still not found after setup, present the manual install instructions and ask to rerun `omc setup` or `omx setup`.
 
 ### Step 5: Set runtime context
 
-Record the following variables for subsequent phases:
+Record the following variables:
 
 | Variable | OMC Value | OMX Value |
 |----------|-----------|-----------|
@@ -139,7 +147,7 @@ Record the following variables for subsequent phases:
 
 ---
 
-**Phase 0 Complete Gate:** Proceed to Phase 1 only when a runtime (OMC or OMX) is confirmed, the deep-interview skill is available, and the user has chosen how to handle pandoc (install or skip). Use `AskUserQuestion` at each missing prerequisite — do not exit silently.
+**Phase 0 Complete Gate:** Proceed to Phase 1 only when OMC or OMX is confirmed, deep-interview is confirmed available, and the user has chosen how to handle pandoc.
 
 ---
 
